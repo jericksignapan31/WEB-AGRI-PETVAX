@@ -1080,6 +1080,16 @@
         paginateData(filteredData);
       }
 
+      document.addEventListener("DOMContentLoaded", () => {
+      function sample() {
+        console.log("1");
+        alert("Button clicked!");
+      }
+
+      // Add the event listener dynamically for the button
+      document.getElementById("sampleButton").addEventListener("click", sample);
+    });
+
       // Function to paginate data and update the table
       function paginateData(data) {
         const dataTableBody = document
@@ -1527,7 +1537,7 @@
         </div>
       </div>
 
-      <button >View PDF</button>
+      <button id="sampleButton">Sample</button>
 
       <!-- Logo on the left side -->
       <div class="logos-container">
