@@ -6,6 +6,7 @@
     <title>Manage Report</title>
     <link rel="stylesheet" href="css/docstyle.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
     <!-- Include Font Awesome CDN in the <head> of your HTML -->
     <link
@@ -866,6 +867,91 @@
             // Redirect to login page if not authenticated
             window.location.href = "index.html";
           }
+
+            // Function to generate and display PDF
+    async function ViewPDF() {
+      const { jsPDF } = window.jspdf; // Load jsPDF
+      const doc = new jsPDF();
+
+      // Check if there is any filtered data
+      if (!filteredData || filteredData.length === 0) {
+        Swal.fire({
+          title: "No Data Available",
+          text: "There is no filtered data to display in the PDF.",
+          icon: "warning",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      // Add title to the PDF
+      doc.setFontSize(16);
+      doc.text("Vaccination Report", 105, 10, { align: "center" });
+
+      // Define table headers
+      const headers = [
+        "No.",
+        "Pet Name",
+        "Date",
+        "Barangay",
+        "Owner's Name",
+        "Species",
+        "Sex",
+        "Age",
+        "No. of Heads",
+        "Color",
+        "Batch No.",
+        "Vaccine Source",
+        "Remarks",
+      ];
+
+      // Initial position for table rows
+      let startY = 20;
+
+      // Add table headers
+      doc.setFontSize(10);
+      headers.forEach((header, i) => {
+        doc.text(header, 10 + i * 25, startY); // Adjust column spacing
+      });
+
+      // Add rows for filtered data
+      filteredData.forEach((entry, index) => {
+        const row = [
+          index + 1,
+          entry.petName || "",
+          entry.vaccinationDate || "",
+          entry.barangay || "",
+          entry.ownerName || "",
+          entry.species || "",
+          entry.sex || "",
+          entry.age || "",
+          entry.heads || "",
+          entry.color || "",
+          entry.batchNo || "",
+          entry.vaccineSource || "",
+          entry.remarks || "",
+        ];
+
+        startY += 10; // Increment row spacing
+        row.forEach((cell, i) => {
+          doc.text(cell.toString(), 10 + i * 25, startY); // Adjust column spacing
+        });
+
+        // Add a new page if the content overflows
+        if (startY > 280) {
+          doc.addPage();
+          startY = 10; // Reset Y position for new page
+        }
+      });
+
+       // Convert the PDF to a Blob and preview it in a new tab
+       const pdfBlob = doc.output("blob");
+      const pdfURL = URL.createObjectURL(pdfBlob);
+      window.open(pdfURL, "_blank");
+    }
+
+    // Attach the function to the View PDF button
+    document.getElementById("ViewPDF").addEventListener("click", ViewPDF);
         });
 
         // Logout function
@@ -1080,15 +1166,7 @@
         paginateData(filteredData);
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
-      function ViewPDF() {
-        console.log("1");
-        alert("Button clicked!");
-      }
-
-      // Add the event listener dynamically for the button
-      document.getElementById("ViewPDF").addEventListener("click", ViewPDF);
-    });
+  
 
       // Function to paginate data and update the table
       function paginateData(data) {
