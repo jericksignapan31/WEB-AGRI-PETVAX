@@ -1,1677 +1,1631 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manage Report</title>
-    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="css/docstyle.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 
- <!-- Include Font Awesome CDN in the <head> of your HTML -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include Font Awesome CDN in the <head> of your HTML -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <style>
-        /* General Layout */
+      /* General Layout */
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Align label and input on the same row */
+      .controls label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      .controls .form-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 180px;
+      }
+
+      /* Ensure the inputs and selects are inline and spaced correctly */
+      .controls select,
+      .controls input[type="text"],
+      .controls input[type="date"] {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        outline: none;
+      }
+
+      /* Buttons */
+      .controls button {
+        padding: 10px 15px;
+        font-size: 16px;
+        color: white;
+        background-color: #4caf50;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .controls button:hover {
+        background-color: #218838;
+      }
+
+      /* Date Range Styling */
+      .date-range {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .date-range input[type="date"] {
+        flex: 1;
+      }
+
+      /* JSON Upload Section */
+      .filter-item {
+        margin-top: 0px;
+        padding: 5px;
+        background-color: #eef;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .filter-item label {
+        font-weight: bold;
+        min-width: 120px;
+      }
+
+      .filter-item input[type="file"] {
+        padding: 5px;
+        font-size: 14px;
+      }
+
+      .filter-item button {
+        padding: 8px 12px;
+        font-size: 14px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .filter-item button:hover {
+        background-color: #218838;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
         .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          flex-direction: column;
+          align-items: stretch;
         }
 
-        /* Align label and input on the same row */
-        .controls label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
+        .filter-item {
+          width: 100%;
         }
 
-        .controls .form-group {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 180px;
-        }
-
-        /* Ensure the inputs and selects are inline and spaced correctly */
-        .controls select,
-        .controls input[type="text"],
-        .controls input[type="date"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input:focus,
-        select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-            outline: none;
-        }
-
-        /* Buttons */
-        .controls button {
-            padding: 10px 15px;
-            font-size: 16px;
-            color: white;
-            background-color: #4caf50;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .controls button:hover {
-            background-color: #218838;
-        }
-
-        /* Date Range Styling */
         .date-range {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
+          width: 100%;
         }
 
         .date-range input[type="date"] {
-            flex: 1;
+          width: 100%;
+          /* Stack them vertically on small screens */
         }
 
-        /* JSON Upload Section */
-        .filter-item {
-            margin-top: 0px;
-            padding: 5px;
-            background-color: #eef;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
+        .controls input[type="text"],
+        .controls select,
+        .controls input[type="date"],
+        .controls button {
+          width: 100%;
+          /* Make inputs and buttons full width on small screens */
         }
 
-        .filter-item label {
-            font-weight: bold;
-            min-width: 120px;
+        button {
+          width: 93%;
+        }
+      }
+
+      /* Wrapper for the header section */
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        /* Space out the left and right sections */
+        align-items: center;
+        /* Vertically align the content */
+        width: 100%;
+        /* Ensure it takes the full width */
+      }
+
+      /* Left section: Province and Date Reported */
+      .left-section {
+        text-align: left;
+        /* Align content to the left */
+      }
+
+      /* Right section: Municipality and Livestock Technician */
+      .right-section {
+        text-align: right;
+        /* Align content to the right */
+      }
+
+      /* Action Buttons Container */
+      .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      /* Button Styling for Edit and Delete */
+      button {
+        padding: 4px 8px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      /* Edit Button Styling */
+      button.edit {
+        background-color: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+      }
+
+      button.edit:hover {
+        background-color: #0056b3;
+        transform: scale(1.1);
+      }
+
+      /* Delete Button Styling */
+      button.delete {
+        background-color: #dc3545;
+        color: white;
+        border: 1px solid #dc3545;
+      }
+
+      button.delete:hover {
+        background-color: #a71d2a;
+        transform: scale(1.1);
+      }
+
+      #dataTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        overflow-x: auto;
+        /* Enables horizontal scrolling */
+        display: block;
+        /* Makes sure the scrollbar applies correctly */
+        max-width: 100%;
+        /* Prevents table from exceeding the viewport */
+        white-space: nowrap;
+        /* Prevents text from wrapping in cells */
+      }
+
+      #dataTable th,
+      #dataTable td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+
+      #dataTable th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+      }
+
+      /* Apply a max-width with overflow for the table container */
+      #dataTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        overflow-x: auto;
+        /* Enables horizontal scrolling */
+        display: block;
+        /* Makes sure the scrollbar applies correctly */
+        max-width: 100%;
+        /* Prevents table from exceeding the viewport */
+        white-space: nowrap;
+        /* Prevents text from wrapping in cells */
+      }
+
+      #dataTable th,
+      #dataTable td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+
+      #dataTable th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+      }
+
+      #pagination {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+      }
+
+      #pagination button {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        cursor: pointer;
+      }
+
+      #pagination button.active {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+      }
+
+      .print-button {
+        margin-bottom: 20px;
+        text-align: right;
+      }
+
+      .print-button button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .print-button button:hover {
+        background-color: #45a049;
+      }
+
+      /* Styling for the Footer Section (Submitted & Noted By) */
+      .headers-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        width: 90%;
+        /* Ensures the row stretches the full width */
+        margin: 0 20px;
+        /* Add margin to the left and right of the entire row */
+      }
+
+      /* Input Styling */
+      input[type="text"],
+      input[type="month"] {
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        border-bottom: 1px solid black;
+        background: none;
+        padding: 5px;
+        outline: none;
+        width: auto;
+      }
+
+      input[type="text"]:focus,
+      input[type="month"]:focus {
+        border-bottom: 2px solid #007bff;
+      }
+
+      .headers-left p,
+      .headers-right p {
+        margin: 0;
+        /* Remove default margin */
+      }
+
+      .headers-left input,
+      .headers-right input {
+        margin-top: 5px;
+        /* Add space between the label and the input */
+        width: 250px;
+        /* Adjust the width of the input fields */
+        margin-left: 10px;
+        /* Add space on the left side of the input fields */
+      }
+
+      .headers-left,
+      .headers-right {
+        display: flex;
+        /* Align items within each section vertically */
+        flex-direction: column;
+        /* Stack the content vertically */
+        align-items: flex-start;
+        /* Align the items to the start of the column */
+        gap: 5px;
+        /* Add space between the label, input, and role */
+      }
+
+      .signature-area {
+        margin-bottom: 10px;
+      }
+
+      .signature-area p {
+        margin: 0;
+      }
+
+      /* Left Section Styling (Logo and Province Info) */
+      .logos-container {
+        margin-top: 40px;
+        margin-left: 20px;
+        position: relative;
+        text-align: center;
+        /* Center the vaccination report title and content */
+      }
+
+      /* Logo styling */
+      .header-logos {
+        position: absolute;
+        top: 0;
+        left: 20px;
+        width: 80px;
+        /* Adjust size as needed */
+        height: auto;
+      }
+
+      .logos-container p {
+        font-size: 16px;
+        margin: 5px 0;
+      }
+
+      @media print {
+        .sidebar,
+        .menu-btn,
+        .print-button,
+        .logout-dropdown,
+        #overlay {
+          display: none;
         }
 
-        .filter-item input[type="file"] {
-            padding: 5px;
-            font-size: 14px;
+        table {
+          border-collapse: collapse;
+          width: 100%;
         }
 
-        .filter-item button {
-            padding: 8px 12px;
-            font-size: 14px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        table th,
+        table td {
+          border: 1px solid #000;
+          padding: 8px;
+          text-align: center;
         }
 
-        .filter-item button:hover {
-            background-color: #218838;
+        h1,
+        .headers-section {
+          text-align: center;
         }
+      }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
+      .filter-container {
+        margin-bottom: 20px;
+      }
 
-            .filter-item {
-                width: 100%;
-            }
+      .filter-container label {
+        font-size: 16px;
+        margin-right: 10px;
+      }
 
-            .date-range {
-                width: 100%;
-            }
+      .filter-container select {
+        padding: 8px;
+        font-size: 16px;
+      }
 
-            .date-range input[type="date"] {
-                width: 100%;
-                /* Stack them vertically on small screens */
-            }
+      /* Style for the number column */
+      .number-column {
+        width: 50px;
+        /* Adjust the width as needed */
+        text-align: center;
+        /* Center-align the numbers */
+      }
 
-            .controls input[type="text"],
-            .controls select,
-            .controls input[type="date"],
-            .controls button {
-                width: 100%;
-                /* Make inputs and buttons full width on small screens */
-            }
+      /* Ensure that the content fits the column size */
+      #dataTable td:nth-child(1),
+      #dataTable th:nth-child(1) {
+        text-align: center;
+        width: 20px;
+        /* Match the header column width */
+      }
 
-            button {
-                width: 93%;
-            }
-        }
+      .filter-section {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
 
-        /* Wrapper for the header section */
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            /* Space out the left and right sections */
-            align-items: center;
-            /* Vertically align the content */
-            width: 100%;
-            /* Ensure it takes the full width */
-        }
+      .filter-section label {
+        margin-right: 10px;
+        font-weight: bold;
+      }
 
-        /* Left section: Province and Date Reported */
-        .left-section {
-            text-align: left;
-            /* Align content to the left */
-        }
+      .filter-section input[type="date"],
+      .filter-section select {
+        margin-right: 0px;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
 
-        /* Right section: Municipality and Livestock Technician */
-        .right-section {
-            text-align: right;
-            /* Align content to the right */
-        }
+      /* Style for the button */
+      #applyFilterButton {
+        padding: 5px 10px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
+      #applyFilterButton:hover {
+        background-color: #0056b3;
+      }
 
-        /* Action Buttons Container */
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
+      input[type="text"] {
+        border: 1px solid #ccc;
+        padding: 5px;
+        font-size: 14px;
+        width: 80%;
+      }
 
-/* Button Styling for Edit and Delete */
-button {
-    padding: 4px 8px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #007bff;
+      }
 
-/* Edit Button Styling */
-button.edit {
-    background-color: #007BFF;
-    color: white;
-    border: 1px solid #007BFF;
-}
+      /* General Styling for the Header Section */
+      .headers-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
 
-button.edit:hover {
-    background-color: #0056b3;
-    transform: scale(1.1);
-}
+      /* Title styling */
+      h1 {
+        text-align: center;
+        margin: 0;
+        padding-top: 80px;
+        padding-bottom: 20px;
+        /* Adjust spacing as needed */
+      }
 
-/* Delete Button Styling */
-button.delete {
-    background-color: #DC3545;
-    color: white;
-    border: 1px solid #DC3545;
-}
+      /* Province and Date styling */
+      p {
+        margin: 5px 0;
+      }
 
-button.delete:hover {
-    background-color: #A71D2A;
-    transform: scale(1.1);
-}
+      p strong {
+        display: inline-block;
+      }
 
-        #dataTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            overflow-x: auto;
-            /* Enables horizontal scrolling */
-            display: block;
-            /* Makes sure the scrollbar applies correctly */
-            max-width: 100%;
-            /* Prevents table from exceeding the viewport */
-            white-space: nowrap;
-            /* Prevents text from wrapping in cells */
-        }
+      /* Province and Date positioning */
+      label[for="dateReported"] {
+        float: left;
+        margin-left: 0px;
+      }
 
-        #dataTable th,
-        #dataTable td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
+      p:has(#dateReportedInput) {
+        float: left;
+      }
 
-        #dataTable th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
+      /* Province and Date styling */
+      .province-date-container {
+        text-align: left;
+        margin-top: 20px;
+      }
 
+      /* Municipality and Livestock Technician positioning */
+      .municipality-technician {
+        float: right;
+        margin-top: 20px;
+      }
 
-        /* Apply a max-width with overflow for the table container */
-        #dataTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            overflow-x: auto;
-            /* Enables horizontal scrolling */
-            display: block;
-            /* Makes sure the scrollbar applies correctly */
-            max-width: 100%;
-            /* Prevents table from exceeding the viewport */
-            white-space: nowrap;
-            /* Prevents text from wrapping in cells */
-        }
-
-        #dataTable th,
-        #dataTable td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        #dataTable th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
-
-
-        #pagination {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-        }
-
-        #pagination button {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            cursor: pointer;
-        }
-
-        #pagination button.active {
-            background-color: #007bff;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .print-button {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .print-button button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .print-button button:hover {
-            background-color: #45a049;
-        }
-
-
-        /* Styling for the Footer Section (Submitted & Noted By) */
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .headers-section,
         .headers-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            width: 90%;
-            /* Ensures the row stretches the full width */
-            margin: 0 20px;
-            /* Add margin to the left and right of the entire row */
-
-
+          flex-direction: column;
+          text-align: center;
+          align-items: center;
         }
 
-        /* Input Styling */
+        .logos-container,
+        .headers-right {
+          text-align: center;
+          padding: 0;
+        }
+
+        .header-logos {
+          height: 60px;
+        }
+
         input[type="text"],
         input[type="month"] {
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            border-bottom: 1px solid black;
-            background: none;
-            padding: 5px;
-            outline: none;
-            width: auto;
+          text-align: center;
+        }
+      }
+
+      /* SweetAlert2 Container Customization */
+      .swal2-container {
+        z-index: 1060; /* Ensure it appears above other elements */
+      }
+
+      /* Dialog Box Styling */
+      .swal2-popup {
+        border-radius: 12px; /* Rounded corners */
+        font-size: 16px; /* Font size for content */
+        background-color: #fdfdfd; /* Background color */
+        border: 2px solid #4caf50; /* Green border for emphasis */
+        padding: 20px;
+      }
+
+      /* Title Styling */
+      .swal2-title {
+        font-size: 24px; /* Larger font size for the title */
+        font-weight: bold;
+        color: #4caf50; /* Green color for the title */
+        margin-bottom: 10px;
+      }
+
+      /* Input Field Styling */
+      .swal2-input {
+        border: 1px solid #ccc; /* Light gray border */
+        border-radius: 5px; /* Rounded input fields */
+        padding: 10px;
+        font-size: 14px;
+        width: 100%; /* Full width */
+        margin-top: 5px;
+      }
+
+      /* Button Styling */
+      .swal2-confirm {
+        background-color: #4caf50; /* Green confirm button */
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      .swal2-confirm:hover {
+        background-color: #45a049; /* Darker green on hover */
+      }
+
+      .swal2-cancel {
+        background-color: #f44336; /* Red cancel button */
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      .swal2-cancel:hover {
+        background-color: #d32f2f; /* Darker red on hover */
+      }
+
+      /* Label Styling */
+      label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+        color: #333; /* Dark text color */
+      }
+
+      /* Custom scrollbar for SweetAlert2 inputs (optional) */
+      .swal2-popup .swal2-content {
+        max-height: 400px; /* Limit content height */
+        overflow-y: auto; /* Add scroll if content overflows */
+        scrollbar-width: thin; /* Firefox scrollbar */
+        scrollbar-color: #ccc #f5f5f5; /* Firefox scrollbar colors */
+      }
+
+      .swal2-popup .swal2-content::-webkit-scrollbar {
+        width: 8px; /* Scrollbar width for WebKit browsers */
+      }
+
+      .swal2-popup .swal2-content::-webkit-scrollbar-thumb {
+        background: #ccc; /* Scrollbar thumb color */
+        border-radius: 10px;
+      }
+
+      .swal2-popup .swal2-content::-webkit-scrollbar-track {
+        background: #f5f5f5; /* Scrollbar track color */
+      }
+
+      /* Responsive Styling */
+      @media (max-width: 768px) {
+        .swal2-popup {
+          width: 90%; /* Reduce width on smaller screens */
         }
 
-        input[type="text"]:focus,
-        input[type="month"]:focus {
-            border-bottom: 2px solid #007bff;
+        .swal2-title {
+          font-size: 20px; /* Smaller title font size */
         }
 
-
-        .headers-left p,
-        .headers-right p {
-            margin: 0;
-            /* Remove default margin */
+        .swal2-input {
+          font-size: 14px; /* Smaller input font size */
         }
-
-        .headers-left input,
-        .headers-right input {
-            margin-top: 5px;
-            /* Add space between the label and the input */
-            width: 250px;
-            /* Adjust the width of the input fields */
-            margin-left: 10px;
-            /* Add space on the left side of the input fields */
-        }
-
-        .headers-left,
-        .headers-right {
-            display: flex;
-            /* Align items within each section vertically */
-            flex-direction: column;
-            /* Stack the content vertically */
-            align-items: flex-start;
-            /* Align the items to the start of the column */
-            gap: 5px;
-            /* Add space between the label, input, and role */
-        }
-
-        .signature-area {
-            margin-bottom: 10px;
-        }
-
-        .signature-area p {
-            margin: 0;
-        }
-
-
-
-
-        /* Left Section Styling (Logo and Province Info) */
-        .logos-container {
-            margin-top: 40px;
-            margin-left: 20px;
-            position: relative;
-            text-align: center;
-            /* Center the vaccination report title and content */
-        }
-
-        /* Logo styling */
-        .header-logos {
-            position: absolute;
-            top: 0;
-            left: 20px;
-            width: 80px;
-            /* Adjust size as needed */
-            height: auto;
-        }
-
-        .logos-container p {
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        @media print {
-
-            .sidebar,
-            .menu-btn,
-            .print-button,
-            .logout-dropdown,
-            #overlay {
-                display: none;
-            }
-
-            table {
-                border-collapse: collapse;
-                width: 100%;
-            }
-
-            table th,
-            table td {
-                border: 1px solid #000;
-                padding: 8px;
-                text-align: center;
-            }
-
-            h1,
-            .headers-section {
-                text-align: center;
-            }
-        }
-
-        .filter-container {
-            margin-bottom: 20px;
-        }
-
-        .filter-container label {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .filter-container select {
-            padding: 8px;
-            font-size: 16px;
-        }
-
-        /* Style for the number column */
-        .number-column {
-            width: 50px;
-            /* Adjust the width as needed */
-            text-align: center;
-            /* Center-align the numbers */
-        }
-
-        /* Ensure that the content fits the column size */
-        #dataTable td:nth-child(1),
-        #dataTable th:nth-child(1) {
-            text-align: center;
-            width: 20px;
-            /* Match the header column width */
-        }
-
-        .filter-section {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        .filter-section label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        .filter-section input[type="date"],
-        .filter-section select {
-            margin-right: 0px;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        /* Style for the button */
-        #applyFilterButton {
-            padding: 5px 10px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #applyFilterButton:hover {
-            background-color: #0056b3;
-        }
-
-        input[type="text"] {
-            border: 1px solid #ccc;
-            padding: 5px;
-            font-size: 14px;
-            width: 80%;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        /* General Styling for the Header Section */
-        .headers-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        /* Title styling */
-        h1 {
-            text-align: center;
-            margin: 0;
-            padding-top: 80px;
-            padding-bottom: 20px;
-            /* Adjust spacing as needed */
-        }
-
-        /* Province and Date styling */
-        p {
-            margin: 5px 0;
-        }
-
-        p strong {
-            display: inline-block;
-        }
-
-        /* Province and Date positioning */
-        label[for="dateReported"] {
-            float: left;
-            margin-left: 0px;
-        }
-
-        p:has(#dateReportedInput) {
-            float: left;
-        }
-
-        /* Province and Date styling */
-        .province-date-container {
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        /* Municipality and Livestock Technician positioning */
-        .municipality-technician {
-            float: right;
-            margin-top: 20px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-
-            .headers-section,
-            .headers-row {
-                flex-direction: column;
-                text-align: center;
-                align-items: center;
-            }
-
-            .logos-container,
-            .headers-right {
-                text-align: center;
-                padding: 0;
-            }
-
-            .header-logos {
-                height: 60px;
-            }
-
-            input[type="text"],
-            input[type="month"] {
-                text-align: center;
-            }
-        }
-
-        /* SweetAlert2 Container Customization */
-.swal2-container {
-    z-index: 1060; /* Ensure it appears above other elements */
-}
-
-/* Dialog Box Styling */
-.swal2-popup {
-    border-radius: 12px; /* Rounded corners */
-    font-size: 16px; /* Font size for content */
-    background-color: #fdfdfd; /* Background color */
-    border: 2px solid #4caf50; /* Green border for emphasis */
-    padding: 20px;
-}
-
-/* Title Styling */
-.swal2-title {
-    font-size: 24px; /* Larger font size for the title */
-    font-weight: bold;
-    color: #4caf50; /* Green color for the title */
-    margin-bottom: 10px;
-}
-
-/* Input Field Styling */
-.swal2-input {
-    border: 1px solid #ccc; /* Light gray border */
-    border-radius: 5px; /* Rounded input fields */
-    padding: 10px;
-    font-size: 14px;
-    width: 100%; /* Full width */
-    margin-top: 5px;
-}
-
-/* Button Styling */
-.swal2-confirm {
-    background-color: #4caf50; /* Green confirm button */
-    color: white;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.swal2-confirm:hover {
-    background-color: #45a049; /* Darker green on hover */
-}
-
-.swal2-cancel {
-    background-color: #f44336; /* Red cancel button */
-    color: white;
-    font-weight: bold;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.swal2-cancel:hover {
-    background-color: #d32f2f; /* Darker red on hover */
-}
-
-/* Label Styling */
-label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-    color: #333; /* Dark text color */
-}
-
-/* Custom scrollbar for SweetAlert2 inputs (optional) */
-.swal2-popup .swal2-content {
-    max-height: 400px; /* Limit content height */
-    overflow-y: auto; /* Add scroll if content overflows */
-    scrollbar-width: thin; /* Firefox scrollbar */
-    scrollbar-color: #ccc #f5f5f5; /* Firefox scrollbar colors */
-}
-
-.swal2-popup .swal2-content::-webkit-scrollbar {
-    width: 8px; /* Scrollbar width for WebKit browsers */
-}
-
-.swal2-popup .swal2-content::-webkit-scrollbar-thumb {
-    background: #ccc; /* Scrollbar thumb color */
-    border-radius: 10px;
-}
-
-.swal2-popup .swal2-content::-webkit-scrollbar-track {
-    background: #f5f5f5; /* Scrollbar track color */
-}
-
-/* Responsive Styling */
-@media (max-width: 768px) {
-    .swal2-popup {
-        width: 90%; /* Reduce width on smaller screens */
-    }
-
-    .swal2-title {
-        font-size: 20px; /* Smaller title font size */
-    }
-
-    .swal2-input {
-        font-size: 14px; /* Smaller input font size */
-    }
-}
-
-/* Wrapper for both left and right sections */
-.container {
-    display: flex;
-    justify-content: space-between; /* Space out left and right sections */
-    align-items: flex-start; /* Align content to the top */
-    width: 100%; /* Ensure it takes the full width */
-    margin-top: 20px; /* Adjust spacing from the top of the page */
-}
-
-/* Left section: Province and Date Reported */
-.left-section {
-    padding-left: 30px;
-    display: flex;
-    flex-direction: column; /* Stack the content vertically */
-    width: 48%; /* Adjust to take up 48% of the container's width */
-}
-
-/* Wrapper for Date Reported label and input */
-.date-container {
-    display: flex;
-    align-items: center; /* Vertically align label and input */
-    gap: 10px; /* Space between label and input */
-}
-
-/* Right section: Municipality and Livestock Technician */
-.right-section {
-    display: flex;
-    flex-direction: column; /* Stack content vertically */
-    width: 48%; /* Adjust to take up 48% of the container's width */
-    justify-content: flex-start; /* Align to the top */
-}
-
-/* Livestock Technician container */
-.livestock-container {
-    display: flex;
-    align-items: center; /* Vertically center the label and input */
-    gap: 10px; /* Space between label and input */
-    margin-bottom: 10px; /* Optional: Adds space after Livestock Technician */
-}
-
-/* Municipality container */
-.municipality-container {
-    display: flex;
-    align-items: center; /* Vertically center the label and input */
-    gap: 10px; /* Space between label and input */
-}
-
-/* Adjust input to prevent overflow and ensure it fills available space */
-.livestock-container input,
-.municipality-container input {
-    width: 100%; /* Allow the input to expand */
-    max-width: 300px; /* Optional: Prevent it from growing too large */
-}
-
-/* Ensure header (Vaccination Report) is centered */
-h1 {
-    text-align: center;
-    font-size: 36px; /* Adjust as needed */
-    margin-bottom: 20px;
-    width: 100%; /* Make sure the header takes up full width */
-}
-
-/* Additional space below the header */
-.container {
-    margin-top: 40px; /* Adjust to align with the header */
-}
-
-/* General button styling for formal design */
-button {
-    padding: 10px 20px;
-    border: 1px solid #ccc;  /* Soft border for formality */
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex; /* Align icon and text side by side */
-    align-items: center;
-    gap: 8px; /* Space between icon and text */
-    font-weight: 500;
-}
-
-/* Icon size consistency */
-button i {
-    font-size: 18px;
-}
-
-/* Formal Edit Button (Blue with Icon) */
-button.edit {
-    background-color: #007BFF;  /* Professional blue */
-    color: white;
-}
-
-button.edit:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-}
-
-/* Formal Delete Button (Red with Icon) */
-button.delete {
-    background-color: #DC3545;  /* Professional red */
-    color: white;
-}
-
-button.delete:hover {
-    background-color: #A71D2A; /* Darker red on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-}
-
-/* Flexbox container for button alignment */
-.action-div {
-    display: flex;
-    gap: 10px; /* Space between buttons */
-    justify-content: flex-start;
-}
-
-
+      }
+
+      /* Wrapper for both left and right sections */
+      .container {
+        display: flex;
+        justify-content: space-between; /* Space out left and right sections */
+        align-items: flex-start; /* Align content to the top */
+        width: 100%; /* Ensure it takes the full width */
+        margin-top: 20px; /* Adjust spacing from the top of the page */
+      }
+
+      /* Left section: Province and Date Reported */
+      .left-section {
+        padding-left: 30px;
+        display: flex;
+        flex-direction: column; /* Stack the content vertically */
+        width: 48%; /* Adjust to take up 48% of the container's width */
+      }
+
+      /* Wrapper for Date Reported label and input */
+      .date-container {
+        display: flex;
+        align-items: center; /* Vertically align label and input */
+        gap: 10px; /* Space between label and input */
+      }
+
+      /* Right section: Municipality and Livestock Technician */
+      .right-section {
+        display: flex;
+        flex-direction: column; /* Stack content vertically */
+        width: 48%; /* Adjust to take up 48% of the container's width */
+        justify-content: flex-start; /* Align to the top */
+      }
+
+      /* Livestock Technician container */
+      .livestock-container {
+        display: flex;
+        align-items: center; /* Vertically center the label and input */
+        gap: 10px; /* Space between label and input */
+        margin-bottom: 10px; /* Optional: Adds space after Livestock Technician */
+      }
+
+      /* Municipality container */
+      .municipality-container {
+        display: flex;
+        align-items: center; /* Vertically center the label and input */
+        gap: 10px; /* Space between label and input */
+      }
+
+      /* Adjust input to prevent overflow and ensure it fills available space */
+      .livestock-container input,
+      .municipality-container input {
+        width: 100%; /* Allow the input to expand */
+        max-width: 300px; /* Optional: Prevent it from growing too large */
+      }
+
+      /* Ensure header (Vaccination Report) is centered */
+      h1 {
+        text-align: center;
+        font-size: 36px; /* Adjust as needed */
+        margin-bottom: 20px;
+        width: 100%; /* Make sure the header takes up full width */
+      }
+
+      /* Additional space below the header */
+      .container {
+        margin-top: 40px; /* Adjust to align with the header */
+      }
+
+      /* General button styling for formal design */
+      button {
+        padding: 10px 20px;
+        border: 1px solid #ccc; /* Soft border for formality */
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex; /* Align icon and text side by side */
+        align-items: center;
+        gap: 8px; /* Space between icon and text */
+        font-weight: 500;
+      }
+
+      /* Icon size consistency */
+      button i {
+        font-size: 18px;
+      }
+
+      /* Formal Edit Button (Blue with Icon) */
+      button.edit {
+        background-color: #007bff; /* Professional blue */
+        color: white;
+      }
+
+      button.edit:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+      }
+
+      /* Formal Delete Button (Red with Icon) */
+      button.delete {
+        background-color: #dc3545; /* Professional red */
+        color: white;
+      }
+
+      button.delete:hover {
+        background-color: #a71d2a; /* Darker red on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+      }
+
+      /* Flexbox container for button alignment */
+      .action-div {
+        display: flex;
+        gap: 10px; /* Space between buttons */
+        justify-content: flex-start;
+      }
     </style>
 
     <script type="module">
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
 
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+      import {
+        getDatabase,
+        ref,
+        onValue,
+        remove,
+        update,
+        get,
+        set,
+        push,
+      } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getDatabase, ref, onValue, remove, update, get, set, push } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
 
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
+        authDomain: "agripetvax-e0902.firebaseapp.com",
+        databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
+        projectId: "agripetvax-e0902",
+        storageBucket: "agripetvax-e0902.firebasestorage.app",
+        messagingSenderId: "6172388895",
+        appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
+        measurementId: "G-PXXRWD5715",
+      };
 
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-            apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
-            authDomain: "agripetvax-e0902.firebaseapp.com",
-            databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
-            projectId: "agripetvax-e0902",
-            storageBucket: "agripetvax-e0902.firebasestorage.app",
-            messagingSenderId: "6172388895",
-            appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
-            measurementId: "G-PXXRWD5715"
-        };
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getDatabase(app);
+      const auth = getAuth(app);
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getDatabase(app);
-        const auth = getAuth(app);
-
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if the user is authenticated
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    // Redirect to login page if not authenticated
-                    window.location.href = 'index.html';
-                }
-            });
-
-            // Logout function
-            document.getElementById('logoutButton').addEventListener('click', async (event) => {
-                event.preventDefault(); // Prevent the default link behavior (navigation)
-
-                // Show a confirmation prompt
-                const isConfirmed = confirm("Are you sure you want to log out?");
-
-                // If the user confirms logout, proceed with signing out
-                if (isConfirmed) {
-                    try {
-                        await signOut(auth); // Sign out the user
-                        window.location.href = 'index.html'; // Redirect to login page
-                    } catch (error) {
-                        console.error("Logout failed: ", error); // Log the error if logout fails
-                    }
-                }
-            });
+      document.addEventListener("DOMContentLoaded", () => {
+        // Check if the user is authenticated
+        onAuthStateChanged(auth, (user) => {
+          if (!user) {
+            // Redirect to login page if not authenticated
+            window.location.href = "index.html";
+          }
         });
-        //end code for logout
 
-        //start code for pages, brgy, 
-        // Function to load and display vaccination data from Firebase
-        // Initialize variables for pagination
-        //start code for pages, brgy, 
-        // Function to load and display vaccination data from Firebase
-        // Initialize variables for pagination
-        let currentPage = 1;
-        let rowsPerPage = 20;
-        let filteredData = []; // Stores the filtered data for pagination
-        // Declare global variables
-        let allData = []; // To store all pet data
-        // Function to handle the file upload and insert data into Firebase
+        // Logout function
+        document
+          .getElementById("logoutButton")
+          .addEventListener("click", async (event) => {
+            event.preventDefault(); // Prevent the default link behavior (navigation)
 
-        document.getElementById('uploadButton').addEventListener('click', () => {
-    const jsonUpload = document.getElementById('jsonUpload');
-    if (jsonUpload.files.length === 0) {
+            // Show a confirmation prompt
+            const isConfirmed = confirm("Are you sure you want to log out?");
+
+            // If the user confirms logout, proceed with signing out
+            if (isConfirmed) {
+              try {
+                await signOut(auth); // Sign out the user
+                window.location.href = "index.html"; // Redirect to login page
+              } catch (error) {
+                console.error("Logout failed: ", error); // Log the error if logout fails
+              }
+            }
+          });
+      });
+      //end code for logout
+
+      //start code for pages, brgy,
+      // Function to load and display vaccination data from Firebase
+      // Initialize variables for pagination
+      //start code for pages, brgy,
+      // Function to load and display vaccination data from Firebase
+      // Initialize variables for pagination
+      let currentPage = 1;
+      let rowsPerPage = 20;
+      let filteredData = []; // Stores the filtered data for pagination
+      // Declare global variables
+      let allData = []; // To store all pet data
+      // Function to handle the file upload and insert data into Firebase
+
+      document.getElementById("uploadButton").addEventListener("click", () => {
+        const jsonUpload = document.getElementById("jsonUpload");
+        if (jsonUpload.files.length === 0) {
+          Swal.fire({
+            title: "No File Selected",
+            text: "Please select a JSON file to upload.",
+            icon: "warning",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
+
         Swal.fire({
-            title: 'No File Selected',
-            text: 'Please select a JSON file to upload.',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to upload this file?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, upload it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
+          title: "Are you sure?",
+          text: "You want to upload this file?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, upload it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
             const file = jsonUpload.files[0];
             const reader = new FileReader();
 
             reader.onload = async (event) => {
-                try {
-                    const jsonData = JSON.parse(event.target.result);
-                    const dataInserted = await insertDataIntoFirebase(jsonData);
+              try {
+                const jsonData = JSON.parse(event.target.result);
+                const dataInserted = await insertDataIntoFirebase(jsonData);
 
-                    if (dataInserted) {
-                        Swal.fire({
-                            title: 'Uploaded!',
-                            text: 'File uploaded and data added to the table successfully.',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'No New Entries',
-                            text: 'No new entries found. Data already exists.',
-                            icon: 'info',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                    displayVaccinationData();
-                } catch (error) {
-                    Swal.fire({
-                        title: 'Invalid File',
-                        text: 'Invalid JSON file format.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
+                if (dataInserted) {
+                  Swal.fire({
+                    title: "Uploaded!",
+                    text: "File uploaded and data added to the table successfully.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                  });
+                } else {
+                  Swal.fire({
+                    title: "No New Entries",
+                    text: "No new entries found. Data already exists.",
+                    icon: "info",
+                    confirmButtonText: "OK",
+                  });
                 }
+                displayVaccinationData();
+              } catch (error) {
+                Swal.fire({
+                  title: "Invalid File",
+                  text: "Invalid JSON file format.",
+                  icon: "error",
+                  confirmButtonText: "OK",
+                });
+              }
             };
 
             reader.readAsText(file);
-        }
-    });
-});
+          }
+        });
+      });
 
+      // Function to insert data into Firebase
+      async function insertDataIntoFirebase(data) {
+        const vaccinationRef = ref(db, "PetVaccinationReports");
 
-        // Function to insert data into Firebase
-        async function insertDataIntoFirebase(data) {
-            const vaccinationRef = ref(db, 'PetVaccinationReports');
+        try {
+          const snapshot = await get(vaccinationRef);
+          const existingData = [];
 
-            try {
-                const snapshot = await get(vaccinationRef);
-                const existingData = [];
+          if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+              existingData.push({
+                key: childSnapshot.key,
+                ...childSnapshot.val(),
+              });
+            });
+          }
 
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        existingData.push({ key: childSnapshot.key, ...childSnapshot.val() });
-                    });
-                }
+          const existingKeys = new Set(
+            existingData.map(
+              (entry) =>
+                `${entry.petName}-${entry.vaccinationDate}-${entry.batchNo}`
+            )
+          );
 
-                const existingKeys = new Set(existingData.map(
-                    entry => `${entry.petName}-${entry.vaccinationDate}-${entry.batchNo}`
-                ));
-
-                const updates = {};
-                let dataInserted = false;
-                data.forEach(entry => {
-                    const uniqueKey = `${entry.petName}-${entry.vaccinationDate}-${entry.batchNo}`;
-                    if (!existingKeys.has(uniqueKey)) {
-                        const key = push(vaccinationRef).key;
-                        updates[key] = entry;
-                        dataInserted = true;
-                    }
-                });
-
-                if (dataInserted) {
-                    await update(vaccinationRef, updates);
-                }
-
-                return dataInserted;
-            } catch (error) {
-                console.error('Error inserting data:', error);
-                return false;
+          const updates = {};
+          let dataInserted = false;
+          data.forEach((entry) => {
+            const uniqueKey = `${entry.petName}-${entry.vaccinationDate}-${entry.batchNo}`;
+            if (!existingKeys.has(uniqueKey)) {
+              const key = push(vaccinationRef).key;
+              updates[key] = entry;
+              dataInserted = true;
             }
+          });
+
+          if (dataInserted) {
+            await update(vaccinationRef, updates);
+          }
+
+          return dataInserted;
+        } catch (error) {
+          console.error("Error inserting data:", error);
+          return false;
         }
+      }
 
-// Function to display vaccination data and handle pagination
-function displayVaccinationData() {
-    const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
-    const vaccinationRef = ref(db, 'PetVaccinationReports'); // Only using 'PetVaccinationReports'
-    let totalHeads = 0;
-    let allData = []; // Clear all data before fetching
+      // Function to display vaccination data and handle pagination
+      function displayVaccinationData() {
+        const dataTableBody = document
+          .getElementById("dataTable")
+          .getElementsByTagName("tbody")[0];
+        const vaccinationRef = ref(db, "PetVaccinationReports"); // Only using 'PetVaccinationReports'
+        let totalHeads = 0;
+        let allData = []; // Clear all data before fetching
 
-    // Fetch data from 'PetVaccinationReports' only
-    get(vaccinationRef).then((vaccinationSnapshot) => {
-        // Process PetVaccinationReports data
-        vaccinationSnapshot.forEach((childSnapshot) => {
-            allData.push({ key: childSnapshot.key, ...childSnapshot.val() });
+        // Fetch data from 'PetVaccinationReports' only
+        get(vaccinationRef)
+          .then((vaccinationSnapshot) => {
+            // Process PetVaccinationReports data
+            vaccinationSnapshot.forEach((childSnapshot) => {
+              allData.push({ key: childSnapshot.key, ...childSnapshot.val() });
+            });
+
+            // Apply filtering and sorting
+            filterData(allData);
+            filteredData.sort(
+              (a, b) =>
+                new Date(a.vaccinationDate) - new Date(b.vaccinationDate)
+            );
+
+            // Paginate and display data
+            paginateData(filteredData);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+            alert("Failed to fetch data. Please try again.");
+          });
+      }
+
+     
+
+      // Function to filter data based on filters
+      function filterData(data) {
+        const barangayFilter = document.getElementById("barangayFilter").value;
+        const petSearch = document
+          .getElementById("petSearch")
+          .value.toLowerCase();
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        filteredData = data.filter((entry) => {
+          const matchesBarangay =
+            !barangayFilter || entry.barangay === barangayFilter;
+          const matchesPetName =
+            !petSearch ||
+            (entry.petName || "").toLowerCase().includes(petSearch);
+          const matchesDate =
+            (!startDate ||
+              new Date(entry.vaccinationDate) >= new Date(startDate)) &&
+            (!endDate || new Date(entry.vaccinationDate) <= new Date(endDate));
+          return matchesBarangay && matchesPetName && matchesDate;
         });
 
-        // Apply filtering and sorting
-        filterData(allData);
-        filteredData.sort((a, b) => new Date(a.vaccinationDate) - new Date(b.vaccinationDate));
-
-        // Paginate and display data
+        currentPage = 1; // Reset to the first page after filtering
         paginateData(filteredData);
-    }).catch((error) => {
-        console.error("Error fetching data:", error);
-        alert("Failed to fetch data. Please try again.");
-    });
-}
+      }
 
-// Function to filter data based on filters
-function filterData(data) {
-    const barangayFilter = document.getElementById("barangayFilter").value;
-    const petSearch = document.getElementById("petSearch").value.toLowerCase();
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
+      // Function to paginate data and update the table
+      function paginateData(data) {
+        const dataTableBody = document
+          .getElementById("dataTable")
+          .getElementsByTagName("tbody")[0];
+        dataTableBody.innerHTML = ""; // Clear the table
 
-    filteredData = data.filter((entry) => {
-        const matchesBarangay = !barangayFilter || entry.barangay === barangayFilter;
-        const matchesPetName = !petSearch || (entry.petName || "").toLowerCase().includes(petSearch);
-        const matchesDate =
-            (!startDate || new Date(entry.vaccinationDate) >= new Date(startDate)) &&
-            (!endDate || new Date(entry.vaccinationDate) <= new Date(endDate));
-        return matchesBarangay && matchesPetName && matchesDate;
-    });
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedData = data.slice(start, end);
 
-    currentPage = 1; // Reset to the first page after filtering
-    paginateData(filteredData);
-}
+        let totalHeads = 0;
+        let rowNumber = start;
 
-// Function to paginate data and update the table
-function paginateData(data) {
-    const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
-    dataTableBody.innerHTML = ""; // Clear the table
+        paginatedData.forEach((entry, index) => {
+          const row = dataTableBody.insertRow();
+          rowNumber++;
+          totalHeads += parseInt(entry.heads) || 0;
 
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const paginatedData = data.slice(start, end);
+          row.insertCell().textContent = rowNumber;
+          row.insertCell().textContent = entry.petName || "";
+          row.insertCell().textContent = entry.vaccinationDate || "";
+          row.insertCell().textContent = entry.barangay || "";
+          row.insertCell().textContent = entry.ownerName || "";
+          row.insertCell().textContent = entry.species || "";
+          row.insertCell().textContent = entry.sex || "";
+          row.insertCell().textContent = entry.age || "";
+          row.insertCell().textContent = entry.heads || "";
+          row.insertCell().textContent = entry.color || "";
+          row.insertCell().textContent = entry.batchNo || "";
+          row.insertCell().textContent = entry.vaccineSource || "";
+          row.insertCell().textContent = entry.remarks || "";
 
-    let totalHeads = 0;
-    let rowNumber = start;
+          // Action buttons
+          const actionCell = row.insertCell();
+          const actionDiv = document.createElement("div");
+          actionDiv.classList.add("action-buttons");
 
-    paginatedData.forEach((entry, index) => {
-        const row = dataTableBody.insertRow();
-        rowNumber++;
-        totalHeads += parseInt(entry.heads) || 0;
+          const editButton = document.createElement("button");
+          editButton.classList.add("edit");
+          editButton.textContent = "Edit";
 
-        row.insertCell().textContent = rowNumber;
-        row.insertCell().textContent = entry.petName || "";
-        row.insertCell().textContent = entry.vaccinationDate || "";
-        row.insertCell().textContent = entry.barangay || "";
-        row.insertCell().textContent = entry.ownerName || "";
-        row.insertCell().textContent = entry.species || "";
-        row.insertCell().textContent = entry.sex || "";
-        row.insertCell().textContent = entry.age || "";
-        row.insertCell().textContent = entry.heads || "";
-        row.insertCell().textContent = entry.color || "";
-        row.insertCell().textContent = entry.batchNo || "";
-        row.insertCell().textContent = entry.vaccineSource || "";
-        row.insertCell().textContent = entry.remarks || "";
-
-        // Action buttons
-        const actionCell = row.insertCell();
-        const actionDiv = document.createElement("div");
-        actionDiv.classList.add("action-buttons");
-
-        const editButton = document.createElement("button");
-editButton.classList.add("edit");
-editButton.textContent = "Edit";
-
-editButton.onclick = async function () {
-    const { value: formValues } = await Swal.fire({
-        title: 'Edit Pet Record',
-        html: `
+          editButton.onclick = async function () {
+            const { value: formValues } = await Swal.fire({
+              title: "Edit Pet Record",
+              html: `
             <label for="swal-pet-name">Pet Name:</label>
-            <input id="swal-pet-name" class="swal2-input" value="${entry.petName || ''}">
+            <input id="swal-pet-name" class="swal2-input" value="${
+              entry.petName || ""
+            }">
 
             <label for="swal-vaccination-date">Vaccination Date:</label>
-            <input id="swal-vaccination-date" class="swal2-input" type="date" value="${entry.vaccinationDate || ''}">
+            <input id="swal-vaccination-date" class="swal2-input" type="date" value="${
+              entry.vaccinationDate || ""
+            }">
 
             <label for="swal-barangay">Barangay:</label>
-            <input id="swal-barangay" class="swal2-input" value="${entry.barangay || ''}">
+            <input id="swal-barangay" class="swal2-input" value="${
+              entry.barangay || ""
+            }">
 
             <label for="swal-owner-name">Owner's Name:</label>
-            <input id="swal-owner-name" class="swal2-input" value="${entry.ownerName || ''}">
+            <input id="swal-owner-name" class="swal2-input" value="${
+              entry.ownerName || ""
+            }">
 
             <label for="swal-species">Species:</label>
-            <input id="swal-species" class="swal2-input" value="${entry.species || ''}">
+            <input id="swal-species" class="swal2-input" value="${
+              entry.species || ""
+            }">
 
             <label for="swal-sex">Sex:</label>
-            <input id="swal-sex" class="swal2-input" value="${entry.sex || ''}">
+            <input id="swal-sex" class="swal2-input" value="${entry.sex || ""}">
 
             <label for="swal-age">Age:</label>
-            <input id="swal-age" class="swal2-input" value="${entry.age || ''}">
+            <input id="swal-age" class="swal2-input" value="${entry.age || ""}">
 
             <label for="swal-heads">No. of Heads:</label>
-            <input id="swal-heads" class="swal2-input" value="${entry.heads || ''}">
+            <input id="swal-heads" class="swal2-input" value="${
+              entry.heads || ""
+            }">
 
             <label for="swal-color">Color:</label>
-            <input id="swal-color" class="swal2-input" value="${entry.color || ''}">
+            <input id="swal-color" class="swal2-input" value="${
+              entry.color || ""
+            }">
 
             <label for="swal-batch-no">Batch No.:</label>
-            <input id="swal-batch-no" class="swal2-input" value="${entry.batchNo || ''}">
+            <input id="swal-batch-no" class="swal2-input" value="${
+              entry.batchNo || ""
+            }">
 
             <label for="swal-vaccine-source">Vaccine Source:</label>
-            <input id="swal-vaccine-source" class="swal2-input" value="${entry.vaccineSource || ''}">
+            <input id="swal-vaccine-source" class="swal2-input" value="${
+              entry.vaccineSource || ""
+            }">
 
             <label for="swal-remarks">Remarks:</label>
-            <input id="swal-remarks" class="swal2-input" value="${entry.remarks || ''}">
+            <input id="swal-remarks" class="swal2-input" value="${
+              entry.remarks || ""
+            }">
         `,
-        focusConfirm: false,
-        preConfirm: () => {
-            return {
-                petName: document.getElementById('swal-pet-name').value,
-                vaccinationDate: document.getElementById('swal-vaccination-date').value,
-                barangay: document.getElementById('swal-barangay').value,
-                ownerName: document.getElementById('swal-owner-name').value,
-                species: document.getElementById('swal-species').value,
-                sex: document.getElementById('swal-sex').value,
-                age: document.getElementById('swal-age').value,
-                heads: document.getElementById('swal-heads').value,
-                color: document.getElementById('swal-color').value,
-                batchNo: document.getElementById('swal-batch-no').value,
-                vaccineSource: document.getElementById('swal-vaccine-source').value,
-                remarks: document.getElementById('swal-remarks').value
-            };
-        }
-    });
-
-    if (formValues) {
-        const {
-            petName, vaccinationDate, barangay, ownerName,
-            species, sex, age, heads, color, batchNo, vaccineSource, remarks
-        } = formValues;
-
-        if (
-            petName && vaccinationDate && barangay && ownerName &&
-            species && sex && age && heads && color && batchNo &&
-            vaccineSource && remarks
-        ) {
-            const updates = {
-                [`PetVaccinationReports/${entry.key}/petName`]: petName,
-                [`PetVaccinationReports/${entry.key}/vaccinationDate`]: vaccinationDate,
-                [`PetVaccinationReports/${entry.key}/barangay`]: barangay,
-                [`PetVaccinationReports/${entry.key}/ownerName`]: ownerName,
-                [`PetVaccinationReports/${entry.key}/species`]: species,
-                [`PetVaccinationReports/${entry.key}/sex`]: sex,
-                [`PetVaccinationReports/${entry.key}/age`]: age,
-                [`PetVaccinationReports/${entry.key}/heads`]: heads,
-                [`PetVaccinationReports/${entry.key}/color`]: color,
-                [`PetVaccinationReports/${entry.key}/batchNo`]: batchNo,
-                [`PetVaccinationReports/${entry.key}/vaccineSource`]: vaccineSource,
-                [`PetVaccinationReports/${entry.key}/remarks`]: remarks,
-
-                // Also update in the register path
-                [`register/${entry.key}/petName`]: petName,
-                [`register/${entry.key}/vaccinationDate`]: vaccinationDate,
-                [`register/${entry.key}/barangay`]: barangay,
-                [`register/${entry.key}/ownerName`]: ownerName,
-                [`register/${entry.key}/species`]: species,
-                [`register/${entry.key}/sex`]: sex,
-                [`register/${entry.key}/age`]: age,
-                [`register/${entry.key}/heads`]: heads,
-                [`register/${entry.key}/color`]: color,
-                [`register/${entry.key}/batchNo`]: batchNo,
-                [`register/${entry.key}/vaccineSource`]: vaccineSource,
-                [`register/${entry.key}/remarks`]: remarks
-            };
-
-            try {
-                await update(ref(db), updates);
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Pet record updated successfully!',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-                displayVaccinationData(); // Refresh table
-            } catch (error) {
-                console.error("Error updating the pet record:", error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Failed to update the pet record. Please try again.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        } else {
-            Swal.fire({
-                title: 'Incomplete Fields',
-                text: 'Please fill out all fields to update the record.',
-                icon: 'warning',
-                confirmButtonText: 'OK'
+              focusConfirm: false,
+              preConfirm: () => {
+                return {
+                  petName: document.getElementById("swal-pet-name").value,
+                  vaccinationDate: document.getElementById(
+                    "swal-vaccination-date"
+                  ).value,
+                  barangay: document.getElementById("swal-barangay").value,
+                  ownerName: document.getElementById("swal-owner-name").value,
+                  species: document.getElementById("swal-species").value,
+                  sex: document.getElementById("swal-sex").value,
+                  age: document.getElementById("swal-age").value,
+                  heads: document.getElementById("swal-heads").value,
+                  color: document.getElementById("swal-color").value,
+                  batchNo: document.getElementById("swal-batch-no").value,
+                  vaccineSource: document.getElementById("swal-vaccine-source")
+                    .value,
+                  remarks: document.getElementById("swal-remarks").value,
+                };
+              },
             });
-        }
-    }
-};
 
+            if (formValues) {
+              const {
+                petName,
+                vaccinationDate,
+                barangay,
+                ownerName,
+                species,
+                sex,
+                age,
+                heads,
+                color,
+                batchNo,
+                vaccineSource,
+                remarks,
+              } = formValues;
 
-        // Delete button
-        const deleteButton = document.createElement("button");
-deleteButton.classList.add("delete");
-deleteButton.textContent = "Archived";
+              if (
+                petName &&
+                vaccinationDate &&
+                barangay &&
+                ownerName &&
+                species &&
+                sex &&
+                age &&
+                heads &&
+                color &&
+                batchNo &&
+                vaccineSource &&
+                remarks
+              ) {
+                const updates = {
+                  [`PetVaccinationReports/${entry.key}/petName`]: petName,
+                  [`PetVaccinationReports/${entry.key}/vaccinationDate`]:
+                    vaccinationDate,
+                  [`PetVaccinationReports/${entry.key}/barangay`]: barangay,
+                  [`PetVaccinationReports/${entry.key}/ownerName`]: ownerName,
+                  [`PetVaccinationReports/${entry.key}/species`]: species,
+                  [`PetVaccinationReports/${entry.key}/sex`]: sex,
+                  [`PetVaccinationReports/${entry.key}/age`]: age,
+                  [`PetVaccinationReports/${entry.key}/heads`]: heads,
+                  [`PetVaccinationReports/${entry.key}/color`]: color,
+                  [`PetVaccinationReports/${entry.key}/batchNo`]: batchNo,
+                  [`PetVaccinationReports/${entry.key}/vaccineSource`]:
+                    vaccineSource,
+                  [`PetVaccinationReports/${entry.key}/remarks`]: remarks,
 
-deleteButton.onclick = async function () {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to recover this entry once Archived!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, Archived it!'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                await update(ref(db), {
-                    [`PetVaccinationReports/${entry.key}`]: null,
-                    [`register/${entry.key}`]: null
-                });
+                  // Also update in the register path
+                  [`register/${entry.key}/petName`]: petName,
+                  [`register/${entry.key}/vaccinationDate`]: vaccinationDate,
+                  [`register/${entry.key}/barangay`]: barangay,
+                  [`register/${entry.key}/ownerName`]: ownerName,
+                  [`register/${entry.key}/species`]: species,
+                  [`register/${entry.key}/sex`]: sex,
+                  [`register/${entry.key}/age`]: age,
+                  [`register/${entry.key}/heads`]: heads,
+                  [`register/${entry.key}/color`]: color,
+                  [`register/${entry.key}/batchNo`]: batchNo,
+                  [`register/${entry.key}/vaccineSource`]: vaccineSource,
+                  [`register/${entry.key}/remarks`]: remarks,
+                };
+
+                try {
+                  await update(ref(db), updates);
+                  Swal.fire({
+                    title: "Success!",
+                    text: "Pet record updated successfully!",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                  });
+                  displayVaccinationData(); // Refresh table
+                } catch (error) {
+                  console.error("Error updating the pet record:", error);
+                  Swal.fire({
+                    title: "Error!",
+                    text: "Failed to update the pet record. Please try again.",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                  });
+                }
+              } else {
                 Swal.fire({
-                    title: 'Archived!',
-                    text: 'The entry has been Archived successfully.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
+                  title: "Incomplete Fields",
+                  text: "Please fill out all fields to update the record.",
+                  icon: "warning",
+                  confirmButtonText: "OK",
                 });
-                displayVaccinationData();
-            } catch (error) {
-                console.error("Error deleting entry:", error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Failed to Archived the entry. Please try again.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
+              }
             }
-        }
-    });
-};
+          };
 
+          // Delete button
+          const deleteButton = document.createElement("button");
+          deleteButton.classList.add("delete");
+          deleteButton.textContent = "Archived";
 
-        actionDiv.appendChild(editButton);
-        actionDiv.appendChild(deleteButton);
-        actionCell.appendChild(actionDiv);
-    });
+          deleteButton.onclick = async function () {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You won't be able to recover this entry once Archived!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "Yes, Archived it!",
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                try {
+                  await update(ref(db), {
+                    [`PetVaccinationReports/${entry.key}`]: null,
+                    [`register/${entry.key}`]: null,
+                  });
+                  Swal.fire({
+                    title: "Archived!",
+                    text: "The entry has been Archived successfully.",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                  });
+                  displayVaccinationData();
+                } catch (error) {
+                  console.error("Error deleting entry:", error);
+                  Swal.fire({
+                    title: "Error!",
+                    text: "Failed to Archived the entry. Please try again.",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                  });
+                }
+              }
+            });
+          };
 
-    updatePaginationControls();
-}
+          actionDiv.appendChild(editButton);
+          actionDiv.appendChild(deleteButton);
+          actionCell.appendChild(actionDiv);
+        });
 
-// Function to update pagination controls (no change needed)
-function updatePaginationControls() {
-    const paginationContainer = document.getElementById("paginationControls");
-    paginationContainer.innerHTML = ""; // Clear previous pagination controls
+        updatePaginationControls();
+      }
 
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      // Function to update pagination controls (no change needed)
+      function updatePaginationControls() {
+        const paginationContainer =
+          document.getElementById("paginationControls");
+        paginationContainer.innerHTML = ""; // Clear previous pagination controls
 
-    for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement("button");
-        button.textContent = i;
-        button.classList.add("pagination-button");
-        if (i === currentPage) button.classList.add("active");
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
-        button.addEventListener("click", () => {
+        for (let i = 1; i <= totalPages; i++) {
+          const button = document.createElement("button");
+          button.textContent = i;
+          button.classList.add("pagination-button");
+          if (i === currentPage) button.classList.add("active");
+
+          button.addEventListener("click", () => {
             currentPage = i;
             paginateData(filteredData);
+          });
+
+          paginationContainer.appendChild(button);
+        }
+      }
+
+      // Event listeners for filters
+      document.getElementById("filterBtn").addEventListener("click", () => {
+        displayVaccinationData();
+      });
+
+      // Event listener for changing rows per page
+      document
+        .getElementById("showEntries")
+        .addEventListener("change", (event) => {
+          rowsPerPage = parseInt(event.target.value);
+          currentPage = 1; // Reset to the first page
+          paginateData(filteredData);
         });
 
-        paginationContainer.appendChild(button);
-    }
-}
+      // Load data on page load
+      window.addEventListener("load", displayVaccinationData);
+
+      //end code for pages
+
+      
 
 
-        // Event listeners for filters
-        document.getElementById("filterBtn").addEventListener("click", () => {
-            displayVaccinationData();
+      //code for date
+      // Event listener to log the selected date
+      const dateReportedInput = document.getElementById("dateReportedInput");
+
+      dateReportedInput.addEventListener("change", () => {
+        const selectedMonthYear = dateReportedInput.value; // Format: "YYYY-MM"
+        console.log("Selected Date Reported:", selectedMonthYear);
+      });
+      //end code for date
+
+      //code for technician
+      // Reference to the input field
+      const technicianNameInput = document.getElementById("technicianName");
+      //end code for technician
+
+      // Optional: Add an event listener to log changes or handle updates
+      technicianNameInput.addEventListener("input", () => {
+        console.log(`Technician Name Updated: ${technicianNameInput.value}`);
+      });
+
+      //code for pet search
+      // Event listener for pet name search
+      document.getElementById("petSearch").addEventListener("input", () => {
+        const petSearch = document
+          .getElementById("petSearch")
+          .value.toLowerCase();
+
+        // Filter data based on pet name
+        const filteredData = allData.filter((entry) => {
+          return (entry.petName || "").toLowerCase().includes(petSearch);
         });
 
-        // Event listener for changing rows per page
-        document.getElementById("showEntries").addEventListener("change", (event) => {
-            rowsPerPage = parseInt(event.target.value);
-            currentPage = 1; // Reset to the first page
-            paginateData(filteredData);
-        });
-
-        // Load data on page load
-        window.addEventListener("load", displayVaccinationData);
-
-
-        //end code for pages
-
-        async function printReport() {
-            console.log('aw');
-            
-    // if (!filteredData || filteredData.length === 0) {
-    //     Swal.fire({
-    //         title: 'No Data',
-    //         text: 'There are no records to display based on the current filters.',
-    //         icon: 'info',
-    //         confirmButtonText: 'OK'
-    //     });
-    //     return;
-    // }
-
-    // // Load jsPDF
-    // const { jsPDF } = window.jspdf;
-
-    // // Create a new jsPDF instance
-    // const doc = new jsPDF();
-
-    // // Title and metadata
-    // doc.setFontSize(16);
-    // doc.text('Filtered Vaccination Report', 105, 15, { align: 'center' });
-    // doc.setFontSize(12);
-    // doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
-
-    // // Table Header
-    // const headers = [
-    //     'Pet Name',
-    //     'Vaccination Date',
-    //     'Barangay',
-    //     'Owner',
-    //     'Species',
-    //     'Sex',
-    //     'Age',
-    //     'Heads',
-    //     'Color',
-    //     'Batch No.',
-    //     'Source',
-    //     'Remarks'
-    // ];
-    // const headerYPosition = 30;
-    // let currentY = headerYPosition;
-
-    // // Add header row
-    // doc.setFontSize(10);
-    // headers.forEach((header, index) => {
-    //     doc.text(header, 10 + index * 18, currentY);
-    // });
-
-    // // Table Rows
-    // filteredData.forEach((row, rowIndex) => {
-    //     currentY += 10;
-    //     if (currentY > 280) {
-    //         doc.addPage(); // Add a new page if content exceeds the page
-    //         currentY = 20;
-    //     }
-
-    //     const rowValues = [
-    //         row.petName,
-    //         row.vaccinationDate,
-    //         row.barangay,
-    //         row.ownerName,
-    //         row.species,
-    //         row.sex,
-    //         row.age,
-    //         row.heads,
-    //         row.color,
-    //         row.batchNo,
-    //         row.vaccineSource,
-    //         row.remarks,
-    //     ];
-
-    //     rowValues.forEach((value, colIndex) => {
-    //         doc.text(String(value || ''), 10 + colIndex * 18, currentY);
-    //     });
-    // });
-
-    // // Open PDF in a new tab
-    // window.open(doc.output('bloburl'), '_blank');
-}
-
-
-
-
-
-
-        //code for date
-        // Event listener to log the selected date
-        const dateReportedInput = document.getElementById('dateReportedInput');
-
-        dateReportedInput.addEventListener('change', () => {
-            const selectedMonthYear = dateReportedInput.value; // Format: "YYYY-MM"
-            console.log("Selected Date Reported:", selectedMonthYear);
-        });
-        //end code for date
-
-
-
-
-        //code for technician
-        // Reference to the input field
-        const technicianNameInput = document.getElementById('technicianName');
-        //end code for technician
-
-
-
-        // Optional: Add an event listener to log changes or handle updates
-        technicianNameInput.addEventListener('input', () => {
-            console.log(`Technician Name Updated: ${technicianNameInput.value}`);
-        });
-
-        //code for pet search 
-        // Event listener for pet name search
-        document.getElementById("petSearch").addEventListener("input", () => {
-            const petSearch = document.getElementById("petSearch").value.toLowerCase();
-
-            // Filter data based on pet name
-            const filteredData = allData.filter((entry) => {
-                return (entry.petName || "").toLowerCase().includes(petSearch);
-            });
-
-            currentPage = 1;
-            paginateData(filteredData);
-        });
-        //end code for pet search
-
+        currentPage = 1;
+        paginateData(filteredData);
+      });
+      //end code for pet search
     </script>
+  </head>
 
-</head>
-
-<body>
-
+  <body>
     <div class="header">
-        <div class="header-left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
-            <span class="welcome-message">AgriPetvax</span>
-        </div>
-        <div class="welcome-container">
-            <span class="welcome-message"> Pet Vaccination Report </span>
-        </div>
-
+      <div class="header-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <img
+          src="img/petlogo.png"
+          alt="Department of Agriculture"
+          class="header-logo"
+        />
+        <span class="welcome-message">AgriPetvax</span>
+      </div>
+      <div class="welcome-container">
+        <span class="welcome-message"> Pet Vaccination Report </span>
+      </div>
     </div>
-
 
     <!-- Sidebar -->
     <div id="mySidebar" class="sidebar">
-        <a href="dashboard.html">
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-        </a>
+      <a href="dashboard.html">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
 
-        <a href="petprofile.html">
-            <i class="fas fa-paw"></i> Pet Record
-        </a>
-        <a href="register.html">
-            <i class="fas fa-clipboard-list"></i> Pet Registration
-        </a>
+      <a href="petprofile.html"> <i class="fas fa-paw"></i> Pet Record </a>
+      <a href="register.html">
+        <i class="fas fa-clipboard-list"></i> Pet Registration
+      </a>
 
-        <a href="vaccination_input.html">
-            <i class="fas fa-notes-medical"></i> Pet Vaccination Entry
-        </a>
+      <a href="vaccination_input.html">
+        <i class="fas fa-notes-medical"></i> Pet Vaccination Entry
+      </a>
 
+      <a href="manage_report.html" class="active">
+        <i class="fas fa-chart-bar"></i> Pet Vaccination Report
+      </a>
 
-        <a href="manage_report.html" class="active">
-            <i class="fas fa-chart-bar"></i> Pet Vaccination Report
-        </a>
-
-
-        <a href="about.html">
-            <i class="fas fa-info-circle"></i> About
-        </a>
-        <!-- Logout Button -->
-        <a href="login.html" id="logoutButton">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-
+      <a href="about.html"> <i class="fas fa-info-circle"></i> About </a>
+      <!-- Logout Button -->
+      <a href="login.html" id="logoutButton">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
     </div>
 
     <!-- Overlay to close sidebar -->
     <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
     <!-- Form Container -->
     <div class="form-container">
-
-        <div class="controls">
-            <!-- Pet Name -->
-            <div class="form-group">
-                <label for="petSearch">Pet Name:</label>
-                <input type="text" id="petSearch" placeholder="Search Pet">
-            </div>
-
-            <!-- Barangay -->
-            <div class="form-group">
-                <label for="barangayFilter">Filter by Barangay:</label>
-                <select id="barangayFilter" name="barangay">
-                    <option value="">All Barangays</option>
-                    <option value="Balacanas">Balacanas</option>
-                    <option value="Dayawan">Dayawan</option>
-                    <option value="Imelda">Imelda</option>
-                    <option value="Katipunan">Katipunan</option>
-                    <option value="Kimaya">Kimaya</option>
-                    <option value="Looc">Looc</option>
-                    <option value="Poblacion1">Poblacion 1</option>
-                    <option value="Poblacion2">Poblacion 2</option>
-                    <option value="Poblacion3">Poblacion 3</option>
-                    <option value="San_martin">San Martin</option>
-                    <option value="Tambobong">Tambobong</option>
-                </select>
-            </div>
-
-            <!-- Date Range -->
-            <div class="date-range">
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate">
-                <span>End Date</span>
-                <input type="date" id="endDate">
-            </div>
-
-            <!-- Show Entries -->
-            <div class="form-group">
-                <label for="showEntries">Show Entries:</label>
-                <select id="showEntries">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
-
-            <!-- Filter Button -->
-            <button id="filterBtn">Filter</button>
-            <!-- JSON Upload -->
-            <div class="filter-item">
-                <label for="jsonUpload">Choose JSON File:</label>
-                <input type="file" id="jsonUpload" accept=".json" multiple>
-                <button id="uploadButton">Upload JSON</button>
-            </div>
-            
-           
+      <div class="controls">
+        <!-- Pet Name -->
+        <div class="form-group">
+          <label for="petSearch">Pet Name:</label>
+          <input type="text" id="petSearch" placeholder="Search Pet" />
         </div>
 
-        <div class="print-button">
-            <button onclick="printReport()">Print</button>
+        <!-- Barangay -->
+        <div class="form-group">
+          <label for="barangayFilter">Filter by Barangay:</label>
+          <select id="barangayFilter" name="barangay">
+            <option value="">All Barangays</option>
+            <option value="Balacanas">Balacanas</option>
+            <option value="Dayawan">Dayawan</option>
+            <option value="Imelda">Imelda</option>
+            <option value="Katipunan">Katipunan</option>
+            <option value="Kimaya">Kimaya</option>
+            <option value="Looc">Looc</option>
+            <option value="Poblacion1">Poblacion 1</option>
+            <option value="Poblacion2">Poblacion 2</option>
+            <option value="Poblacion3">Poblacion 3</option>
+            <option value="San_martin">San Martin</option>
+            <option value="Tambobong">Tambobong</option>
+          </select>
         </div>
 
-
-
-
-
-
-        <!-- Logo on the left side -->
-        <div class="logos-container">
-            <img src="img/logo.png" alt="Department of Agriculture" class="header-logos">
+        <!-- Date Range -->
+        <div class="date-range">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate" />
+          <span>End Date</span>
+          <input type="date" id="endDate" />
         </div>
-        <h1>Vaccination Report</h1>
-        <div class="header-container">
 
-            <!-- Left side: Province and Date Reported -->
-            <div class="left-section">
-                <p><strong>Province:</strong> Misamis Oriental</p>
-                <!-- Date Reported on the same row -->
-                <div class="date-container">
-                    <label for="dateReported"><strong>Date Reported:</strong></label>
-                    <input type="month" id="dateReportedInput" value="2025-01">
-                </div>
-            </div>
+        <!-- Show Entries -->
+        <div class="form-group">
+          <label for="showEntries">Show Entries:</label>
+          <select id="showEntries">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
 
-             <!-- Right section: Municipality and Livestock Technician -->
-    <div class="right-section">
+        <!-- Filter Button -->
+        <button id="filterBtn">Filter</button>
+        <!-- JSON Upload -->
+        <div class="filter-item">
+          <label for="jsonUpload">Choose JSON File:</label>
+          <input type="file" id="jsonUpload" accept=".json" multiple />
+          <button id="uploadButton">Upload JSON</button>
+        </div>
+      </div>
 
+      <button >Print</button>
 
-        <!-- Municipality (Now below Livestock Technician) -->
-        <div class="municipality-container">
+      <!-- Logo on the left side -->
+      <div class="logos-container">
+        <img
+          src="img/logo.png"
+          alt="Department of Agriculture"
+          class="header-logos"
+        />
+      </div>
+      <h1>Vaccination Report</h1>
+      <div class="header-container">
+        <!-- Left side: Province and Date Reported -->
+        <div class="left-section">
+          <p><strong>Province:</strong> Misamis Oriental</p>
+          <!-- Date Reported on the same row -->
+          <div class="date-container">
+            <label for="dateReported"><strong>Date Reported:</strong></label>
+            <input type="month" id="dateReportedInput" value="2025-01" />
+          </div>
+        </div>
+
+        <!-- Right section: Municipality and Livestock Technician -->
+        <div class="right-section">
+          <!-- Municipality (Now below Livestock Technician) -->
+          <div class="municipality-container">
             <p><strong>Municipality:</strong> Villanueva</p>
-        </div>
+          </div>
 
-                <!-- Livestock Technician (Now at the top) -->
-                <div class="livestock-container">
-                    <strong>Livestock Technician:</strong>
-                    <input type="text" value="Bonifacio Q. Escatron" placeholder="Enter name" required>
-                </div>
+          <!-- Livestock Technician (Now at the top) -->
+          <div class="livestock-container">
+            <strong>Livestock Technician:</strong>
+            <input
+              type="text"
+              value="Bonifacio Q. Escatron"
+              placeholder="Enter name"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- First Column: Pet Profile Table -->
+      <div class="table-container">
+        <table id="dataTable" class="green-table">
+          <thead>
+            <tr>
+              <th class="number-column">#</th>
+              <!-- Add a class to the number column -->
+              <th>Pet Name</th>
+              <th>Date</th>
+              <th>Barangay</th>
+
+              <th>Owner's Name</th>
+
+              <th>Species</th>
+              <th>Sex</th>
+
+              <th>Age</th>
+              <th>No. of heads</th>
+              <th>Color</th>
+              <th>Batch/Lot No.</th>
+              <th>Vaccine Source</th>
+              <th>Remarks</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data rows will be dynamically inserted here by Firebase -->
+          </tbody>
+        </table>
+      </div>
+      <div id="paginationControls" class="pagination"></div>
+
+      <div class="headers-row">
+        <div class="headers-left">
+          <p>
+            <strong>Submitted by:</strong>
+            <input
+              type="text"
+              id="submittedBy"
+              value="Bonifacio Q. Escatron"
+              placeholder="Enter name"
+              required
+            />
+          </p>
+          <p>Livestock Technician</p>
+        </div>
+        <div class="headers-right">
+          <p>
+            <strong>Noted by:</strong>
+            <input
+              type="text"
+              id="noteddBy"
+              value="Silvestre L. Gorre Jr., PhD"
+              placeholder="Enter name"
+              required
+            />
+          </p>
+          <p>Municipal Agriculturist</p>
+        </div>
+      </div>
     </div>
-        </div>
-
-
-
-
-
-        <!-- First Column: Pet Profile Table -->
-        <div class="table-container">
-
-
-            <table id="dataTable" class="green-table">
-                <thead>
-                    <tr>
-                        <th class="number-column">#</th> <!-- Add a class to the number column -->
-                        <th>Pet Name</th>
-                        <th>Date</th>
-                        <th>Barangay</th>
-
-                        <th>Owner's Name</th>
-
-                        <th>Species</th>
-                        <th>Sex</th>
-
-                        <th>Age</th>
-                        <th>No. of heads</th>
-                        <th>Color</th>
-                        <th>Batch/Lot No.</th>
-                        <th>Vaccine Source</th>
-                        <th>Remarks</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data rows will be dynamically inserted here by Firebase -->
-                </tbody>
-            </table>
-        </div>
-        <div id="paginationControls" class="pagination"></div>
-
-
-        <div class="headers-row">
-            <div class="headers-left">
-                <p><strong>Submitted by:</strong>
-                    <input type="text" id="submittedBy" value="Bonifacio Q. Escatron" placeholder="Enter name" required>
-                </p>
-                <p>Livestock Technician</p>
-
-            </div>
-            <div class="headers-right">
-                <p><strong>Noted by:</strong>
-                    <input type="text" id="noteddBy" value="Silvestre L. Gorre Jr., PhD" placeholder="Enter name"
-                        required>
-                </p>
-                <p>Municipal Agriculturist</p>
-            </div>
-        </div>
-
-
-
-
-
-
-    </div>
-
-
-
 
     <!-- JavaScript for toggling sidebar -->
     <script src="js/sidebar.js"></script>
 
-    <script>
-
-
-
-
-
-
-
-
-
-
-
-    </script>
-</body>
-
+    <script></script>
+  </body>
 </html>
