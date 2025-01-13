@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agripetvax Documentation</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+    <style>
+     
+      
+      
+        .form-container {
+            padding: 50px;
+            width: 80%;
+            max-width: 800px;
+            color: #3c4043;
+            margin: 150px auto 40px auto;
+        }
+        #controlsContainer {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #searchBar {
+            display: flex;
+            align-items: rightside;
+            background-color: #e9f5eb;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 5px;
+            color: #3c4043;
+        }
+        #searchIcon {
+            font-size: 18px;
+            color: #28a745;
+            margin-right: 5px;
+        }
+        #searchInput {
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        #imageFolders {
+            margin-top: 20px;
+        }
+        .folder {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f5f5f5;
+        }
+        .folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .folder-content {
+            display: none;
+            padding-bottom: 10px;
+            position: relative;
+        }
+        .toggle-button {
+            cursor: pointer;
+            color: #28a745;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            font-weight: bold;
+            background: none;
+            border: none;
+        }
+        .toggle-button:hover {
+            color: #28a745;
+        }
+        .remove-image-btn {
+            cursor: pointer;
+            color: #28a745;
+            background: none;
+            border: none;
+            font-size: 14px;
+        }
+        .remove-image-btn:hover {
+            color: #28a745;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+    </style>
+   <script type="module">
+  
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, get, set, push } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
+            authDomain: "agripetvax-e0902.firebaseapp.com",
+            databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
+            projectId: "agripetvax-e0902",
+            storageBucket: "agripetvax-e0902.firebasestorage.app",
+            messagingSenderId: "6172388895",
+            appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
+            measurementId: "G-PXXRWD5715"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+  </script>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+
+        <div class="welcome-container" onclick="toggleLogoutDropdown()">
+            <img src="img/username.png" alt="Username Icon" class="user-icon">
+            <span class="welcome-message">Welcome, Admin</span>
+        </div>
+
+        <div id="logoutDropdown" class="logout-dropdown">
+            <button id="logoutButton">
+                <img src="img/logout.png" alt="Logout Icon" class="logout-icon">
+                Logout
+            </button>
+        </div>
+    </div>
+
+  
+  <!-- Sidebar -->
+  <div id="mySidebar" class="sidebar">
+    <a href="dashboard.html" >
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="petprofile.html" >
+        <i class="fas fa-paw"></i> Pet Profile
+    </a>
+    <a href="register.html">
+        <i class="fas fa-clipboard-list"></i> Registration
+    </a>
+
+    <a href="vaccination_input.html">
+        <i class="fas fa-notes-medical"></i> Vaccination Entry
+    </a>
+   
+    <a href="offline_mode.html">
+        <i class="fas fa-plug"></i> Offline Mode
+    </a>
+    <a href="manage_report.html">
+        <i class="fas fa-chart-bar"></i> Vaccination Report
+    </a>
+    <a href="documentation.html" class="active">
+        <i class="fas fa-book"></i> Documentation
+    </a>
+    <a href="about.html">
+        <i class="fas fa-info-circle"></i> About
+    </a>
+</div>
+
+
+    <!-- Main Content -->
+    <div class="form-container">
+      
+
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+   
+        <h2>Documentation</h2>
+      
+        <div id="controlsContainer">
+            <div id="uploadForm">
+                <input type="file" id="imageInput" multiple accept="image/*">
+                <button id="uploadBtn">Upload</button>
+            </div>
+            <div id="searchBar">
+                <span id="searchIcon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search by date, month, year, or name">
+            </div>
+        </div>
+
+        <div id="imageFolders"></div>
+   
+
+</div>
+
+    <script>
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById("mySidebar");
+            const overlay = document.getElementById("overlay");
+
+            // Toggle sidebar and overlay visibility
+            if (sidebar.style.left === "-240px" || !sidebar.style.left) {
+                sidebar.style.left = "0";
+                overlay.style.display = "block"; // Show overlay
+            } else {
+                closeSidebar();
+            }
+        }
+
+        // Close sidebar when clicking outside
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.left = "-240px";
+            document.getElementById("overlay").style.display = "none"; // Hide overlay
+        }
+
+        // Close sidebar when clicking on overlay
+        document.getElementById("overlay").addEventListener("click", closeSidebar);
+    </script>
+
+
+
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imageFolders = document.getElementById('imageFolders');
+        const searchInput = document.getElementById('searchInput');
+        let storedImages = JSON.parse(localStorage.getItem('uploadedImagesByDate')) || {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            displayImageFolders();
+        });
+
+        uploadBtn.addEventListener('click', function() {
+            const files = imageInput.files;
+            if (files.length === 0) {
+                alert("Please select images to upload.");
+                return;
+            }
+
+            const today = new Date().toLocaleDateString();
+            if (!storedImages[today]) {
+                storedImages[today] = [];
+            }
+
+            for (let file of files) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const imageData = {
+                            src: e.target.result,
+                            name: file.name,
+                            type: file.type,
+                            dimensions: `${img.width} x ${img.height}`,
+                            size: (file.size / 1024).toFixed(2) + ' KB',
+                            date: new Date().toLocaleString()
+                        };
+
+                        storedImages[today].push(imageData);
+                        localStorage.setItem('uploadedImagesByDate', JSON.stringify(storedImages));
+
+                        displayImageFolders();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        searchInput.addEventListener('input', function() {
+            displayImageFolders(searchInput.value.toLowerCase());
+        });
+
+        function displayImageFolders(searchQuery = '') {
+            imageFolders.innerHTML = '';
+            for (const [date, images] of Object.entries(storedImages)) {
+                if (date.toLowerCase().includes(searchQuery) || images.some(img => img.name.toLowerCase().includes(searchQuery))) {
+                    const folderDiv = document.createElement('div');
+                    folderDiv.classList.add('folder');
+                    
+                    folderDiv.innerHTML = `
+                        <div class="folder-header">
+                            <span><strong>${date}</strong></span>
+                            <button class="toggle-button" onclick="toggleFolder('${date}', this)">View</button>
+                        </div>
+                        <div class="folder-content" id="folder-${date}">
+                              ${images.map((image, index) => `
+                                <div class="image-container">
+                                    <img src="${image.src}" alt="${image.name}" width="50">
+                                    <span>${image.name}</span> - ${image.dimensions}, ${image.size}
+                                    <button class="remove-image-btn" onclick="removeImage('${date}', ${index})">Remove</button>
+                                </div>`).join('')}
+                        </div>
+                    `;
+                    imageFolders.appendChild(folderDiv);
+                }
+            }
+        }
+
+        function toggleFolder(date, button) {
+            const folderContent = document.getElementById(`folder-${date}`);
+            const isOpen = folderContent.style.display === 'block';
+            
+            folderContent.style.display = isOpen ? 'none' : 'block';
+            button.textContent = isOpen ? 'View' : 'Back';
+        }
+
+        function removeImage(date, index) {
+            if (confirm('Are you sure you want to remove this image?')) {
+                storedImages[date].splice(index, 1); // Remove the specific image from the array
+                localStorage.setItem('uploadedImagesByDate', JSON.stringify(storedImages));
+                displayImageFolders(); // Re-render the image list after removal
+            }
+        }
+</script>
+
+</body>
+</html>

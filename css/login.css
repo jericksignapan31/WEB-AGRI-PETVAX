@@ -1,0 +1,62 @@
+
+
+/* Login form container */
+.login-form {
+    background: linear-gradient(to bottom right, rgba(0, 192, 127, 0.8), rgba(0, 115, 86, 0.8)); /* Semi-transparent gradient */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    color: black; /* Text color changed to black */
+}
+
+/* Form title */
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: black;
+}
+
+/* Input fields and button styling */
+.login-form input[type="text"],
+.login-form input[type="password"],
+.login-form button {
+    width: 100%; /* Full width */
+    padding: 10px;
+    margin: 10px 0; /* Space between inputs */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box; /* Ensures consistent sizing */
+}
+
+/* Submit button styling */
+.login-form button {
+    background-color: #00c07f;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: bold; /* Makes the text stand out */
+}
+
+/* Button hover effect */
+.login-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Logo styling */
+.login-form img {
+    max-width: 30%; /* Ensure the logo spans the form width */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 auto 20px auto;
+    display: block;
+}
+
+/* Error message styling */
+#errorMessage {
+    color: red;
+    text-align: center;
+}

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    /* General Container Styling */
+.form-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border: 1px solid #e0e0e0;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #444;
+    font-weight: 600;
+}
+
+/* Logo Styling */
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.about-logo {
+    width: 150px;
+    height: auto;
+    border-radius: 50%;
+    border: 4px solid #4CAF50;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+/* Mission and Vision Styling */
+.mission-vision {
+    margin-top: 30px;
+    padding: 20px;
+    border-top: 2px solid #4CAF50;
+}
+
+.mission-vision p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #555;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 20px;
+    }
+
+}
+
+</style>
+    <script type="module">
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, get, set, push } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
+            authDomain: "agripetvax-e0902.firebaseapp.com",
+            databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
+            projectId: "agripetvax-e0902",
+            storageBucket: "agripetvax-e0902.firebasestorage.app",
+            messagingSenderId: "6172388895",
+            appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
+            measurementId: "G-PXXRWD5715"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if the user is authenticated
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    // Redirect to login page if not authenticated
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Logout function
+            document.getElementById('logoutButton').addEventListener('click', async (event) => {
+                event.preventDefault(); // Prevent the default link behavior (navigation)
+
+                // Show a confirmation prompt
+                const isConfirmed = confirm("Are you sure you want to log out?");
+
+                // If the user confirms logout, proceed with signing out
+                if (isConfirmed) {
+                    try {
+                        await signOut(auth); // Sign out the user
+                        window.location.href = 'index.html'; // Redirect to login page
+                    } catch (error) {
+                        console.error("Logout failed: ", error); // Log the error if logout fails
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+
+        <div class="welcome-container" onclick="toggleLogoutDropdown()">
+            <img src="img/username.png" alt="Username Icon" class="user-icon">
+            <span class="welcome-message">Welcome, Admin</span>
+        </div>
+
+        <div id="logoutDropdown" class="logout-dropdown">
+            <button id="logoutButton">
+                <img src="img/logout.png" alt="Logout Icon" class="logout-icon">
+                Logout
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="petprofile.html">
+            <i class="fas fa-paw"></i> Pet Profile
+        </a>
+        <a href="register.html">
+            <i class="fas fa-clipboard-list"></i> Registration
+        </a>
+
+        <a href="vaccination_input.html">
+            <i class="fas fa-notes-medical"></i> Vaccination Entry
+        </a>
+
+
+        <a href="manage_report.html">
+            <i class="fas fa-chart-bar"></i> Vaccination Report
+        </a>
+      
+        <a href="about.html" class="active">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+    </div>
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <div class="form-container">
+        <h2 style="color:black">About Us</h2>
+        <div class="about-content">
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Agripetvax Logo" class="about-logo">
+            </div>
+            <div class="mission-vision">
+                <h3 style="color:black">Mission</h3>
+                <p style="color:black">"Villanueva is Able to Uplift the Quality of Life of its Constituents through the
+                    Provision
+                    of adequate Socio-economic Services and Facilities, Promotion of Agro-industrial Development and
+                    Maintenance
+                    of Ecological Balance."</p>
+                <h3 style="color:black">Vision</h3>
+                <p style="color:black">"Villanueva is an Aggressive, Agro-Industrial Center In Northern Mindanao
+                    Empowered with
+                    Pro-active and Responsive Governance in a Stable and Secure Environment of Peace-Loving, Socially
+                    and Morally
+                    Responsive Constituents enjoying Improved Quality of Life."</p>
+            </div>
+        </div>
+    </div>
+     <!-- Main Content -->
+     <div class="form-container">
+        <h2 style="color:black">About Us</h2>
+        <div class="about-content">
+            <div class="logo-container">
+                <img src="img/petlogo.png" alt="Agripetvax Logo" class="about-logo">
+            </div>
+            <div class="mission-vision">
+                <h3 style="color:black">Mission</h3>
+                <p style="color:black">"Villanueva is Able to Uplift the Quality of Life of its Constituents through the
+                    Provision
+                    of adequate Socio-economic Services and Facilities, Promotion of Agro-industrial Development and
+                    Maintenance
+                    of Ecological Balance."</p>
+                <h3 style="color:black">Vision</h3>
+                <p style="color:black">"Villanueva is an Aggressive, Agro-Industrial Center In Northern Mindanao
+                    Empowered with
+                    Pro-active and Responsive Governance in a Stable and Secure Environment of Peace-Loving, Socially
+                    and Morally
+                    Responsive Constituents enjoying Improved Quality of Life."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for toggling sidebar -->
+    <script src="js/sidebar.js"></script>
+
+</body>
+
+</html>

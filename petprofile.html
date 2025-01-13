@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Profile</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+<style>
+/* Table Container Styling */
+#petTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    overflow-x: auto; /* Enables horizontal scrolling */
+    display: block;    /* Allows scrolling to work properly */
+    max-width: 100%;   /* Prevents the table from overflowing the viewport */
+    white-space: nowrap; /* Prevents text from wrapping inside table cells */
+}
+
+/* Styling for Table Header and Cells */
+#petTable th,
+#petTable td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Header Styling */
+#petTable th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* Alternating Row Color for Better Readability */
+#petTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hover Effect on Rows */
+#petTable tr:hover {
+    background-color: #e6f7ff;
+}
+</style>
+    <script type="module">
+
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, remove, update, get, set, push, child } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
+            authDomain: "agripetvax-e0902.firebaseapp.com",
+            databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
+            projectId: "agripetvax-e0902",
+            storageBucket: "agripetvax-e0902.firebasestorage.app",
+            messagingSenderId: "6172388895",
+            appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
+            measurementId: "G-PXXRWD5715"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if the user is authenticated
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    // Redirect to login page if not authenticated
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Logout function
+            document.getElementById('logoutButton').addEventListener('click', async (event) => {
+                event.preventDefault(); // Prevent the default link behavior (navigation)
+
+                // Show a confirmation prompt
+                const isConfirmed = confirm("Are you sure you want to log out?");
+
+                // If the user confirms logout, proceed with signing out
+                if (isConfirmed) {
+                    try {
+                        await signOut(auth); // Sign out the user
+                        window.location.href = 'index.html'; // Redirect to login page
+                    } catch (error) {
+                        console.error("Logout failed: ", error); // Log the error if logout fails
+                    }
+                }
+            });
+        });
+        //end code for logout
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const petTableBody = document.querySelector("#petTable tbody");
+            const vaccinationTableBody = document.querySelector("#vaccinationTable tbody");
+            const vaccinationTableContainer = document.querySelector("#vaccinationTable").closest(".table-container");
+            const searchBar = document.querySelector("#searchBar");
+            const prevPageButton = document.getElementById('prevPage');
+            const nextPageButton = document.getElementById('nextPage');
+            const pageNumber = document.getElementById('pageNumber');
+
+            const pageInfo = document.querySelector("#pageInfo");
+            const rowsPerPage = 20; // Number of rows per page
+            let currentPage = 1;
+            let allPetData = []; // Store all pet data
+            let filteredData = []; // Data to display after filtering
+            const petRef = ref(db, "register");
+
+            // Load pet data from Firebase
+            function loadPetData() {
+                onValue(petRef, (snapshot) => {
+                    allPetData = []; // Clear all data
+                    snapshot.forEach((childSnapshot) => {
+                        allPetData.push(childSnapshot.val()); // Add each pet data to the list
+                    });
+                    filteredData = [...allPetData]; // Initialize filtered data
+                    renderTable(); // Render the table for the first page
+                });
+            }
+
+            // Render the table for the current page
+            function renderTable() {
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+                const currentData = filteredData.slice(startIndex, endIndex);
+
+                petTableBody.innerHTML = "";
+
+                if (currentData.length === 0) {
+                    petTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">No results found.</td></tr>`;
+                } else {
+                    currentData.forEach((petData) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                    <td>${petData.petName}</td>
+                    <td>${petData.barangay}</td>
+                    <td>${petData.ownerName}</td>
+                    <td>${petData.species}</td>
+                    <td>${petData.sex}</td>
+                    <td>${petData.age}</td>
+                    <td>${petData.heads}</td>
+                    <td>${petData.color}</td>
+                    <td><button class="view-btn">View Record</button></td>
+                `;
+                        row.querySelector(".view-btn").addEventListener("click", () => {
+                            showVaccinationDetails(petData);
+                        });
+                        petTableBody.appendChild(row);
+                    });
+                }
+
+                updatePaginationInfo();
+            }
+
+            // Update pagination info
+            function updatePaginationInfo() {
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                pageNumber.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+
+                // Disable/Enable buttons based on current page
+                prevPageButton.disabled = currentPage === 1;
+                nextPageButton.disabled = currentPage === totalPages;
+            }
+
+
+            // Go to the previous page
+            function prevPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                }
+            }
+            // Go to the next page
+            function nextPage() {
+                const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                }
+            }
+
+            // Filter the table based on search input
+            function searchTable(query) {
+                query = query.toLowerCase();
+                filteredData = allPetData.filter((petData) => {
+                    return (
+                        (petData.petName && petData.petName.toLowerCase().includes(query)) ||
+                        (petData.species && petData.species.toLowerCase().includes(query)) ||
+                        (petData.barangay && petData.barangay.toLowerCase().includes(query))
+                    );
+                });
+
+                currentPage = 1; // Reset to the first page
+                renderTable();
+            }
+
+            // Attach event listeners
+            searchBar.addEventListener("input", (e) => {
+                searchTable(e.target.value);
+            });
+            prevPageButton.addEventListener("click", prevPage);
+            nextPageButton.addEventListener("click", nextPage);
+
+            // Load data when the page loads
+            loadPetData();
+
+
+
+            function showVaccinationDetails(petData) {
+                // Log the pet data to debug
+                console.log("Selected Pet Data:", petData);
+
+                // Update pet profile fields
+                document.getElementById("petName").textContent = petData.petName || 'N/A';
+                document.getElementById("ownerName").textContent = petData.ownerName || 'N/A';
+                document.getElementById("barangay").textContent = petData.barangay || 'N/A';
+                document.getElementById("species").textContent = petData.species || 'N/A';
+                document.getElementById("age").textContent = petData.age || 'N/A';
+                document.getElementById("sex").textContent = petData.sex || 'N/A';
+                document.getElementById("color").textContent = petData.color || 'N/A';
+
+                const vaccinationRef = ref(db, "PetVaccinationReports");
+                const vaccinationTableBody = document.getElementById("vaccinationTableBody");
+
+                // Clear previous vaccination data
+                vaccinationTableBody.innerHTML = '';
+
+                // Listen for vaccination data changes
+                onValue(vaccinationRef, (snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        const entry = childSnapshot.val();
+
+                        // Match vaccination records with the selected pet
+                        if (entry.petName === petData.petName) {
+                            // Create a new row for each vaccination record
+                            const newRow = document.createElement("tr");
+
+                            // Populate the row with vaccination data
+                            newRow.innerHTML = `
+                    <td>${entry.vaccinationDate || 'N/A'}</td>
+                    <td>${entry.batchNo || 'N/A'}</td>
+                    <td>${entry.vaccineSource || 'N/A'}</td>
+                    <td>${entry.remarks || 'N/A'}</td>
+                `;
+
+                            // Append the new row to the vaccination table body
+                            vaccinationTableBody.appendChild(newRow);
+                        }
+                    });
+                });
+
+
+            }
+
+
+
+            // Load data when the page loads
+            loadPetData();
+        });
+
+
+
+
+
+
+
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+        <div class="welcome-container">
+            <span class="welcome-message"> Pet Vaccination Record </span>
+        </div>
+
+    </div>
+
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="petprofile.html" class="active">
+            <i class="fas fa-paw"></i> Pet Record
+        </a>
+        <a href="register.html">
+            <i class="fas fa-clipboard-list"></i> Pet Registration
+        </a>
+
+        <a href="vaccination_input.html">
+            <i class="fas fa-notes-medical"></i> Pet Vaccination Entry
+        </a>
+
+
+        <a href="manage_report.html">
+            <i class="fas fa-chart-bar"></i> Pet Vaccination Report
+        </a>
+
+
+    
+        <a href="about.html">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+        <!-- Logout Button -->
+        <a href="#" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+
+    </div>
+
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+
+    <div class="form-container">
+
+
+        <!-- Search bar container -->
+        <div class="search-container">
+
+            <input type="text" id="searchBar" placeholder="Search Pet name, owner's name, species">
+        </div>
+        <div class="container">
+            <!-- First Column: Pet Profile Table -->
+            <div class="table-container">
+                <table id="petTable">
+                    <thead>
+                        <tr>
+                            <th>Pet Name</th>
+                            <th>Barangay</th>
+                            <th>Owner's Name</th>
+                            <th>Species</th>
+                            <th>Sex</th>
+                            <th>Age</th>
+                            <th>No. of Heads</th>
+                            <th>Color</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="petTableBody">
+                        <!-- Pet rows will be added here -->
+                    </tbody>
+                </table>
+                <!-- Pagination Controls -->
+                <div class="pagination">
+                    <button id="prevPage">Previous</button>
+                    <span id="pageNumber">Page 1 of 1</span>
+                    <button id="nextPage">Next</button>
+                </div>
+            </div>
+            <!-- Second Column: Vaccination Details Table -->
+            <div class="table-container hidden">
+                <h2>Pet Vaccination Record</h2>
+
+                <table id="petTable">
+                    <tr>
+                        <td><strong>Pet Name</strong></td>
+                        <td id="petName">N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Owner's Name</strong></td>
+                        <td id="ownerName">N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Barangay</strong></td>
+                        <td id="barangay">N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Species</strong></td>
+                        <td id="species">N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Age</strong></td>
+                        <td id="age">N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sex</strong></td>
+                        <td id="sex">N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Color</strong></td>
+                        <td id="color">N/A</td>
+                    </tr>
+                    </thead>
+                    <tbody id="petTableBody">
+                        <!-- Vaccination rows will be added here -->
+                    </tbody>
+                </table>
+
+                <h2>Vaccination Monitoring</h2>
+
+                <table id="vaccinationTable" border="1">
+                    <thead>
+                        <tr>
+
+                            <th>Date</th>
+                            <th>Batch No</th>
+                            <th>Vaccine Source</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vaccinationTableBody">
+                        <!-- Vaccination rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript for toggling sidebar -->
+    <script src="js/sidebar.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchBar = document.getElementById("searchBar");
+            const petTableBody = document.querySelector("#petTable tbody");
+
+            // Search functionality
+            searchBar.addEventListener("keyup", () => {
+                const filter = searchBar.value.toLowerCase();
+                const rows = petTableBody.getElementsByTagName("tr");
+
+                // Loop through all table rows
+                for (let i = 0; i < rows.length; i++) {
+                    const cells = rows[i].getElementsByTagName("td");
+                    let match = false;
+
+                    // Check each cell in the row
+                    for (let j = 0; j < cells.length; j++) {
+                        if (j === 0 || j === 1 || j === 3) { // Pet Name, Owner's Name, Species
+                            const textValue = cells[j].textContent || cells[j].innerText;
+                            if (textValue.toLowerCase().includes(filter)) {
+                                match = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Show/hide the row based on the match
+                    rows[i].style.display = match ? "" : "none";
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        let allData = []; // Holds all data from Firebase
+        let currentPage = 1;
+        const rowsPerPage = 20; // Number of rows per page
+
+        // Function to load data into the table
+        function loadTableData(data) {
+            const tableBody = document.querySelector("#dataTable tbody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            // Calculate start and end indices for the current page
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, data.length);
+
+            // Populate table rows for the current page
+            for (let i = startIndex; i < endIndex; i++) {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                <td>${data[i].petName}</td>
+                <td>${data[i].ownerName}</td>
+                <td>${data[i].species}</td>
+            `;
+            }
+        }
+
+
+
+        // Search Functionality
+        function searchTable(query) {
+            const filteredData = allData.filter(item => {
+                return (
+                    item.petName.toLowerCase().includes(query.toLowerCase()) ||
+                    item.ownerName.toLowerCase().includes(query.toLowerCase()) ||
+                    item.species.toLowerCase().includes(query.toLowerCase())
+                );
+            });
+            currentPage = 1; // Reset to the first page
+            loadTableData(filteredData);
+            handlePagination();
+        }
+
+        // Example Firebase Fetching Data
+        async function fetchDataFromFirebase() {
+            // Simulate fetching data from Firebase
+            allData = await getMockFirebaseData();
+            loadTableData(allData);
+            handlePagination();
+        }
+
+        function getMockFirebaseData() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(Array.from({ length: 100 }, (_, i) => ({
+                        petName: `Pet ${i + 1}`,
+                        ownerName: `Owner ${i + 1}`,
+                        species: `Species ${i + 1}`
+                    })));
+                }, 1000);
+            });
+        }
+
+        // Event Listener for Search Input
+        document.querySelector("#searchBar").addEventListener("input", e => {
+            searchTable(e.target.value);
+        });
+
+        // Fetch and load data on page load
+        fetchDataFromFirebase();
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

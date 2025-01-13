@@ -1,0 +1,1137 @@
+/* General body styling */
+body {
+  background-color: white;
+  margin: 0;
+  padding: 0;
+  transition: margin-left 0.3s;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  justify-content: flex-start;
+  font-family: Arial, sans-serif;
+  padding-top: 100px; /* Add padding to the top to account for the fixed header */
+}
+
+/* Header styling */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #07693e;
+  box-shadow: 0 2px 5px rgba(7, 29, 8, 0.068);
+  padding: 1em 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10; /* Ensure it stays above other elements */
+  color: white;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-btn {
+  font-size: 30px;
+  cursor: pointer;
+  margin-left: 10px;
+  background-color: transparent;
+  color: white;
+  padding: 10px;
+  border: none;
+  margin-right: 10px; /* Space between button and logo */
+  display: block;
+}
+
+.app-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: hsl(129, 83%, 23%);
+}
+
+h3 {
+  font-size: 20px;
+  background-color: transparent;
+  color: #07693e;
+  border: none;
+  text-align: center;
+}
+
+/* Logo styling */
+.header-logo {
+  width: 40px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.headers {
+  width: 220px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Sidebar styling */
+.sidebar {
+  height: 100%;
+  width: 240px;
+  position: fixed;
+  top: 84px; /* Starts just below the header */
+  left: -240px;
+  color: white;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
+  transition: 0.3s;
+  z-index: 5;
+  padding-top: 10px; /* Reduced padding for better positioning */
+  background-color: #07693e;
+  margin-bottom: 10px;
+}
+
+/* Sidebar links */
+.sidebar a {
+  padding: 15px 20px;
+  text-decoration: none;
+  font-size: 16px;
+  color: white;
+  align-items: center;
+  display: block;
+  transition: 0.3s;
+  width: 100%; /* Full width when active */
+}
+
+/* Sidebar links hover effect */
+.sidebar a:hover {
+  background-color: black;
+}
+
+/* Active link styling */
+.sidebar a.active {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  width: 100%; /* Full width when active */
+}
+
+/* Style for each submenu item */
+.submenu {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: none;
+  border-radius: 5px;
+  background-color: transparent; /* No background color initially */
+}
+
+.submenu:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Light gray on hover */
+}
+
+.submenu.active {
+  color: black; /* Change text color to black for visibility */
+  background-color: white; /* White background when active */
+}
+
+/* Overlay for hiding sidebar */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  display: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  /* Header padding for medium screens */
+  .header {
+    padding: 1em;
+  }
+
+  /* Adjust the menu button size for smaller screens */
+  .menu-btn {
+    font-size: 26px;
+  }
+
+  /* Adjust the sidebar width */
+  .sidebar {
+    width: 200px;
+      z-index: 5;
+    
+  }
+
+  /* Make the sidebar links smaller on medium screens */
+  .sidebar a {
+    font-size: 14px;
+    
+  }
+}
+
+/* Responsive Design for smaller screens (max-width: 768px) */
+@media screen and (max-width: 768px) {
+  .header {
+    padding: 1em;
+  }
+
+  /* Header logo and app name adjustment */
+  .header-logo {
+    width: 30px;
+  }
+
+  .app-name {
+    font-size: 18px;
+  }
+
+  .menu-btn {
+    font-size: 24px;
+  }
+
+  /* Adjust sidebar width */
+  .sidebar {
+    width: 180px;
+    z-index: 5;
+  }
+
+  /* Make sidebar links more compact */
+  .sidebar a {
+    font-size: 14px;
+  }
+
+  /* Stack the sidebar links vertically for mobile */
+  .sidebar a {
+    padding: 12px 15px;
+  }
+
+  .main-content {
+    margin-left: 0; /* No margin offset */
+  }
+
+  /* Adjust for smaller submenu items */
+  .submenu {
+    font-size: 14px;
+  }
+}
+
+/* Responsive Design for very small screens (max-width: 480px) */
+@media screen and (max-width: 480px) {
+  .header {
+    padding: 0.8em;
+  }
+
+  /* Adjust the menu button size */
+  .menu-btn {
+    font-size: 22px;
+  }
+
+  /* Smaller sidebar */
+  .sidebar {
+    width: 150px;
+    z-index: 5;
+  }
+
+  /* Sidebar links font size */
+  .sidebar a {
+    font-size: 12px;
+  }
+
+  /* Adjust submenu font size */
+  .submenu {
+    font-size: 12px;
+  }
+
+  /* Footer adjustments for very small screens */
+  footer {
+    font-size: 12px;
+    padding: 15px;
+  }
+
+  /* Adjust header logo size for very small screens */
+  .header-logo {
+    width: 25px;
+  }
+
+  /* Adjust app name for very small screens */
+  .app-name {
+    font-size: 16px;
+  }
+}
+
+
+
+/* Form container styling */
+.form-container {
+  background: linear-gradient(to bottom right, rgba(0, 192, 127, 0.8), rgba(0, 115, 86, 0.8)); /* Same gradient as login form */
+  padding-top: 0px;
+  padding: 20px;
+   border-radius:8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 1200px;
+    color: black;
+    margin: 20px auto;
+  
+}
+
+/* Form container heading */
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: black;
+}
+
+/* Image grid styling for 10 boxes */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Image item */
+.image-item {
+    background-color: #f1f3f4;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Image styling */
+.image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+
+
+
+/* Dashboard content styling */
+.dashboard-content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Information boxes for dashboard */
+.info-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
+    text-align: center;
+    width: 300px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.label {
+    font-weight: bold;
+}
+
+.time-label {
+    font-weight: bold;
+}
+
+/* Chart box for dashboard */
+.chart-box img {
+    width: 200px;
+    height: auto;
+}
+
+/* General styling for age-selector */
+.age-selector {
+  display: flex;
+  gap: 10px;
+  width: 600px;
+  flex-direction: row; /* Initially, items are arranged in a row */
+  justify-content: space-between; /* Add space between items */
+}
+
+.age-row {
+  display: flex;
+  flex-direction: row; /* Age Number and Age Unit side by side */
+  gap: 10px; /* Space between dropdowns */
+  width: 100px; /* Adjust based on content */
+}
+
+.age-selector select {
+  width: 100%; /* Make the dropdowns full width */
+  padding: 8px; /* Add some padding for better appearance */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Responsive Design for small screens (max-width: 768px) */
+@media screen and (max-width: 768px) {
+  .age-selector {
+    width: 100%; /* Take full width on smaller screens */
+    flex-direction: column; /* Stack items vertically on small screens */
+    gap: 15px; /* Space between items in the column */
+  }
+
+  .age-row {
+    width: 100%; /* Make each age row take full width */
+    flex-direction: column; /* Stack Age Number and Age Unit vertically */
+    gap: 5px; /* Space between number and unit */
+  }
+
+  .age-selector select {
+    width: 100%; /* Ensure each select dropdown takes full width */
+  }
+}
+
+/* Responsive Design for very small screens (max-width: 480px) */
+@media screen and (max-width: 480px) {
+  .age-selector {
+    width: 100%; /* Full width for very small screens */
+    padding: 0 10px; /* Add some padding for better spacing */
+  }
+
+  .age-row {
+    width: 100%;
+    flex-direction: column; /* Stack vertically */
+    gap: 5px; /* Space between number and unit */
+  }
+
+  .age-selector select {
+    width: 100%; /* Ensure select is full width */
+    padding: 6px; /* Adjust padding for smaller screens */
+  }
+}
+
+
+/* Form group styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  width: 100%; /* Ensures consistent width for all form groups */
+  box-sizing: border-box;
+}
+
+/* Form group label styling */
+.form-group label {
+  font-weight: bold;
+  color: black;
+  margin-bottom: 5px;
+  font-size: 1rem; /* Consistent font size for labels */
+}
+
+/* Input, select, and button styling */
+.form-group input, 
+.form-group select, 
+.form-group textarea,
+.form-group button {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f2f2f2;
+  color: #333;
+  width: 100%; /* Ensures inputs span the full width of their container */
+  box-sizing: border-box;
+  font-size: 1rem; /* Consistent font size for inputs */
+}
+
+/* Grid container for form */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+  gap: 30px; /* Space between grid items */
+  width: 100%; /* Full width of the container */
+  box-sizing: border-box;
+}
+
+/* Grid item styling */
+.grid-item {
+  width: 100%; /* Grid items take full width of their container */
+  box-sizing: border-box;
+}
+
+/* Media query for smaller devices (like mobile) */
+@media (max-width: 768px) {
+  /* Ensure grid container takes up the full width */
+  .grid-container {
+      grid-template-columns: 1fr; /* Single column layout for mobile */
+      gap: 10px; /* Add some space between form groups */
+      width: 120%; /* Ensure it stretches fully */
+      
+  }
+
+  .form-group {
+      width: 85%; /* Ensure form groups stretch to 100% of the container width */
+  }
+
+  .form-group label {
+      font-size: 0.9rem; /* Adjust label font size */
+      margin-bottom: 5px;
+  }
+
+  .form-group input {
+      font-size: 0.9rem; /* Adjust input font size */
+      padding: 8px; /* Adjust padding to fit smaller screens */
+      width: 100%; /* Ensure input fields take up full width of their container */
+      box-sizing: border-box; /* Ensure padding is included in width calculation */
+  }
+
+  /* Adjust the form container for mobile */
+  .form-container {
+    padding-right: 30px;
+    padding-left: 30px;
+      padding: 50px; /* Reduce padding for smaller devices */
+      width: 85%; /* Ensure it fits within screen */
+  }
+}
+
+/* Media query for very small screens (below 480px) */
+@media (max-width: 480px) {
+  .form-group input {
+      padding: 6px; /* Reduce padding further for very small screens */
+      font-size: 0.8rem; /* Reduce font size for smaller screens */
+  }
+
+  .form-group label {
+      font-size: 0.85rem; /* Reduce font size for labels */
+  }
+
+  .form-container {
+      padding: 15px; /* Even less padding for very small screens */
+  }
+}
+
+ 
+  #loginModal {
+    display: none; /* Hide modal by default */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    z-index: 1000;
+}
+
+
+
+
+
+
+h2 {
+  text-align: center;
+  color: #216d24;
+}
+
+.contact-columns {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap; /* Allows columns to stack on smaller screens */
+}
+
+.contact-column {
+  flex: 1; /* Each column takes equal space */
+  padding: 10px;
+  box-sizing: border-box;
+  margin: 10px; /* Spacing between columns */
+  text-align: center; /* Center text in each column */
+  border: 1px solid #ddd; /* Optional border around columns */
+  border-radius: 5px;
+}
+
+.contact-column h3 {
+  margin-bottom: 10px;
+}
+
+.contact-column a {
+  text-decoration: none;
+  color: #007bff; /* Link color */
+}
+
+.contact-column a:hover {
+  text-decoration: underline;
+}
+
+
+.about-container {
+  background-color: white; /* White background for the About section */
+  border-radius: 5px; /* Rounded corners */
+  padding: 20px; /* Padding inside the container */
+  margin: 20px 0; /* Space above and below the About section */
+}
+
+.about-content {
+  display: flex; /* Use flexbox to align logo and text */
+  align-items: center; /* Center items vertically */
+  justify-content: space-between; /* Space between logo and text */
+}
+
+.about-logo {
+  width: 150px; /* Set a width for the logo */
+  height: auto; /* Maintain aspect ratio */
+  margin-right: 20px; /* Space between logo and text */
+}
+
+
+
+
+/* Services section styling */
+.services-container {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f7f7f7; /* Light background for contrast */
+}
+
+.service-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* Ensure cards wrap on smaller screens */
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.service-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 280px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.service-card:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+}
+
+.service-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.service-card h3 {
+  margin-top: 15px;
+  color: #00c07f;
+  font-size: 1.2em;
+}
+
+.service-card p {
+  font-size: 1em;
+  color: #333;
+  margin-top: 10px;
+}
+
+@media (min-width: 768px) {
+  form {
+      grid-template-columns: repeat(2, 1fr);
+  }
+
+  button {
+      grid-column: span 2;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+      font-size: 1.5em;
+  }
+
+  label {
+      font-size: 0.9em;
+  }
+
+  input, select, textarea {
+      font-size: 0.9em;
+  }
+
+  th, td {
+      font-size: 0.8em;
+  }
+}
+
+ /* Styling for header and user info container */
+
+
+ .user-icon {
+  height: 50px; /* Match height of header-logo */
+ 
+}
+   /* Right section styling (user icon and welcome message) */
+   .welcome-container {
+    display: flex;
+    align-items: center;
+    gap: 0px; /* Reduced gap for closer spacing */
+    margin-left: auto; /* Pushes this section to the far right */
+    padding-right: 40px; /* Adds extra space on the right */
+    max-width: 250px; /* Limits the maximum width of this section */
+    white-space: nowrap; /* Prevents text wrapping */
+    overflow: hidden; /* Ensures content doesn't overflow out */
+    text-overflow: ellipsis; /* Adds "..." if the text is too long */
+    cursor: pointer; /* Make it look clickable */
+      
+}
+
+
+.welcome-message {
+  margin-left: 10px;
+  font-size: 20;
+  font-weight: bold;
+}
+       
+#logoutButton {
+  border: none;
+  font-size: 16px;
+  padding: 15px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 125px; /* Distance from the bottom */
+  text-decoration: none;
+  color: white;
+  align-items: center;
+  display: flex;
+  gap: 10px; /* Spacing between icon and text */
+  transition: background-color 0.3s ease, font-size 0.3s ease, padding 0.3s ease;
+  width: 100%; /* Full width when active */
+}
+
+/* Logout button hover effect */
+#logoutButton:hover {
+  background-color: #e74c3c;
+}
+
+/* Styling for the logout icon */
+.logout-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  #logoutButton {
+    font-size: 14px; /* Smaller font size for smaller screens */
+    padding: 10px 15px; /* Reduced padding */
+    bottom: 100px; /* Adjust bottom distance for smaller screens */
+  }
+
+  .logout-icon {
+    width: 18px; /* Slightly smaller icon */
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  #logoutButton {
+    font-size: 12px; /* Even smaller font size for very small screens */
+    padding: 8px 10px; /* Further reduced padding */
+    bottom: 80px; /* Adjust bottom distance for very small screens */
+  }
+
+  .logout-icon {
+    width: 16px; /* Smaller icon size */
+    height: 16px;
+  }
+}
+
+
+
+
+
+h1 {
+  margin-top: 15px; /* Adjust this value to move the heading up */
+  font-size: 2em; /* Adjust font size */
+  color: black; /* Adjust color */
+  text-align: left; /* Align text to the left */
+  padding: 0; /* Remove padding */
+ }
+
+ 
+/* Button container styling */
+.button-container {
+  display: flex;
+  gap: 15px; /* Space between the buttons */
+  width: 100%;
+  }
+
+/* Button styling */
+.button-container button {
+  
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28e4a8; /* Green color */
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%; /* Ensure button takes full width of its container */
+}
+
+/* Hover effect */
+.button-container button:hover {
+  background-color: #1dbf83; /* Darker green on hover */
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+  .button-container {
+    width: 85%; /* Align with form on smaller screens */
+      padding: 0; /* Remove extra padding */
+      margin-top: 10px; /* Adjust spacing for smaller screens */
+      }
+  
+  /* Adjust button styles for smaller screens */
+  .button-container button {
+    font-size: 14px; /* Reduce font size for better fit */
+    padding: 10px; /* Adjust padding for smaller screens */
+  }
+}
+
+/* Media query for very small screens (max-width: 480px) */
+@media (max-width: 480px) {
+  .button-container {
+    padding: 8px; /* Reduce padding further on very small screens */
+  }
+
+  .button-container button {
+    font-size: 14px; /* Ensure buttons still have an appropriate size */
+    padding: 8px; /* Further adjust padding for small screens */
+  }
+}
+
+
+
+.search-container {
+  width: 95%;
+  margin-top: 5px;
+  display: flex;
+  justify-content:right;
+  margin-bottom: 10px;
+  align-items: right;
+  padding-top: 5px;
+ 
+}
+
+/* Search Bar Styling */
+#searchBar {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 2px solid #089654;
+  border-radius: 4px;
+  width: 40%; /* Adjust width as needed */
+  outline: none;
+  background-color: white !important; /* Forces white background */
+  color: black;
+  background: url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat scroll 15px 8px;
+  background-size: 20px;
+  padding-left: 40px;
+}
+
+/* Placeholder Styling */
+#searchBar::placeholder {
+  font-size: 14px;
+  color: black;
+  opacity: 0.7;
+}
+
+/* Focus Effect */
+#searchBar:focus {
+  border-color: #089654;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  background-color: white; /* Ensures background stays white */
+}
+
+
+#pagination {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#pagination button {
+  width: 100px; /* Set a fixed width for all buttons */
+  padding: 8px;
+  margin: 0 5px;
+  background-color: #089654;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px; /* Ensure consistent font size */
+  text-align: center;
+}
+
+#pagination button:hover {
+  background-color: #07693e;
+}
+
+
+/* Container for all rows */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px; /* Space between tables */
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+
+}
+
+/* Individual squares (boxes) */
+.table-container {
+  flex: 1 1 45%; /* Allow tables to take up 45% width and wrap on smaller screens */
+  min-width: 300px; /* Ensure minimum width for small screens */
+  border: 2px solid #216d24;
+  border-radius: 5px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* Horizontal scroll for smaller devices */
+}
+
+/* Green title for details table */
+.table-container h2 {
+    color: green;
+    /* Green color for the title */
+
+    font-size: 1.2em;
+    /* Adjust title font size */
+    margin-bottom: 10px;
+    /* Tighten space below the title */
+}
+
+/* Table styles inside the containers */
+table {
+    width: 100%;
+    /* Table takes up 100% of the container's width */
+    border-collapse: collapse;
+    text-align: left;
+    table-layout: fixed; /* Fix column widths */
+    font-family: Arial, sans-serif;
+
+    font-size: 0.75em;
+    /* Reduce font size to fit */
+    margin-top: 0;
+    /* Remove margin-top to ensure tightness */
+}
+
+th,
+td {
+    border: 1px solid #089654;
+    text-align: left;
+    white-space: nowrap; /* Prevent text wrapping */
+overflow: hidden; /* Hide overflow text */
+text-overflow: ellipsis; /* Add ellipsis (...) for overflowing text */
+
+    padding: 6px 10px;
+    /* Reduced padding to make table fit */
+}
+
+th {
+    background: linear-gradient(to bottom right, rgba(0, 192, 127, 0.8), rgba(0, 115, 86, 0.8)); /* Same gradient as login form */
+    font-weight: bold;
+
+}
+thead th, tbody td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+  background-color: #e9f7ff;
+}
+
+
+/* Action Button Styles */
+button.view-btn {
+    font-size: 0.7em;
+    /* Smaller button text */
+    padding: 4px 8px;
+    /* Reduced button padding */
+    background-color: #4CAF50;
+    /* Green button */
+    color: white;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    display:flex;
+    justify-content: center;
+
+
+}
+
+button.view-btn:hover {
+    background-color: #45a049;
+    /* Darker green on hover */
+}
+
+.vaccinationTableBody {
+    margin-bottom: 20px;
+}
+
+.vaccinationTableBody div {
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.vaccinationTableBody span {
+    font-weight: bold;
+}
+    /* Style for long text in specific columns */
+.long-text {
+white-space: nowrap;
+text-overflow: ellipsis;
+overflow: hidden;
+}
+
+/* Optional: Add styles for responsiveness */
+@media (max-width: 768px) {
+    .table-container {
+        width: 100%;
+        /* Stack on small screens */
+    }
+
+    table {
+        width: 100%;
+        /* Table adjusts to fit container */
+    }
+
+    button.view-btn {
+        font-size: 0.9em;
+        /* Slightly larger button on small screens */
+    }
+}
+
+
+td:first-child {
+
+    width: 30%;
+    text-align: left;
+
+}
+
+td:last-child {
+    width: 70%;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.icon-container img {
+  width: 50px;
+  height: 50px;
+  filter: brightness(0.5) contrast(1.2) sepia(1) hue-rotate(100deg) saturate(3); /* Approximates #216d24 */
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #f1f1f1; /* Default background color */
+  border: 1px solid #216d24; /* Border for buttons */
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+/* Hover effect for pagination buttons */
+.pagination button:hover {
+  background-color: #216d24; /* Change to blue on hover */
+  color: white; /* Text color changes to white on hover */
+}
+
+/* Disabled state (already provided) */
+.pagination button:disabled {
+  background-color: #216d24;
+  cursor: not-allowed;
+}
+
+
+.view-more-button {
+  display: inline-block;
+  text-align: center;
+  background-color: #07693e; /* Match your theme color */
+  color: white;
+  padding: 10px 18px; /* Slightly more padding for better size */
+  text-decoration: none; /* Remove underline */
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 12px; /* Adjust the font size */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: background-color 0.3s, transform 0.3s ease, box-shadow 0.3s; /* Added transform for scaling */
+}
+
+.view-more-button:hover {
+  background-color: #064d2b; /* Darker shade for hover effect */
+  transform: scale(1.05); /* Smooth scale on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Slightly bigger shadow on hover */
+}
+
+.view-more-button:active {
+  transform: scale(1); /* Reset scaling when clicked */
+}
+
+.view-btn {
+  display: inline-block;
+  text-align:start;
+  background-color: #07693e; /* Match your theme color */
+  color: white;
+  padding: 10px 20px; /* Slightly more padding for better size */
+  text-decoration: none; /* Remove underline */
+  border-radius: 5px;
+ 
+  font-size: 30px; /* Adjust the font size */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  transition: background-color 0.3s, transform 0.3s ease, box-shadow 0.3s; /* Added transform for scaling */
+}
+
+.view-btn:hover {
+  background-color: #064d2b; /* Darker shade for hover effect */
+  transform: scale(1.05); /* Smooth scale on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Slightly bigger shadow on hover */
+}
+
+.view-btn:active {
+  transform: scale(1); /* Reset scaling when clicked */
+}
+
+#technicianName {
+  border: 1px solid #ccc;
+  padding: 5px;
+  font-size: 14px;
+  width: auto;
+}
+

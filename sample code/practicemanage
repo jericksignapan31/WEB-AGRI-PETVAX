@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Report</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Container for the header section */
+.headers-section {
+    text-align: center;
+    margin: 20px auto;
+    padding: 10px;
+    max-width: 800px;
+}
+
+/* Logo styling */
+.logos-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.header-logo {
+    width: 80px; /* Adjust logo size */
+    height: auto;
+}
+
+/* Report title styling */
+.report-title {
+    font-size: 24px;
+    margin: 10px 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Header row container */
+.headers-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Styling for header details */
+.headers-left,
+.headers-right {
+    width: 48%; /* Ensure equal width */
+    font-size: 16px;
+    text-align: left;
+}
+
+/* Ensure responsiveness */
+@media screen and (max-width: 768px) {
+    .headers-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .headers-left,
+    .headers-right {
+        width: 100%; /* Full width for smaller screens */
+    }
+
+    .header-logo {
+        margin-bottom: 10px; /* Add spacing for small screens */
+    }
+}
+
+        .print-button {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .print-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .print-button button:hover {
+            background-color: #45a049;
+        }
+
+       
+   
+
+        @media print {
+
+            .sidebar,
+            .menu-btn,
+            .print-button,
+            .logout-dropdown,
+            #overlay {
+                display: none;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            table th,
+            table td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: center;
+            }
+
+            h1,
+            .headers-section {
+                text-align: center;
+            }
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .filter-container label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .filter-container select {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        /* Style for the number column */
+        .number-column {
+            width: 50px;
+            /* Adjust the width as needed */
+            text-align: center;
+            /* Center-align the numbers */
+        }
+
+        /* Ensure that the content fits the column size */
+        #dataTable td:nth-child(1),
+        #dataTable th:nth-child(1) {
+            text-align: center;
+            width: 20px;
+            /* Match the header column width */
+        }
+
+        .filter-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.filter-section label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.filter-section input[type="date"],
+.filter-section select {
+    margin-right: 0px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Style for the button */
+#applyFilterButton {
+    padding: 5px 10px;
+    border: none;
+    background-color:  #07693e;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#applyFilterButton:hover {
+    background-color:  #064d2b;
+}
+
+/* Container for the filter section */
+.filter-section-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin: 20px 0;
+}
+
+/* Individual filter items */
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Input and select styles */
+.filter-item input,
+.filter-item select,
+.filter-item button {
+    
+    padding: 5px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Button specific styling */
+.filter-item button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-item button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+    .filter-section-container {
+        flex-direction: column;
+    }
+
+    .filter-item {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .filter-item input,
+    .filter-item select,
+    .filter-item button {
+        width: 100%;
+    }
+}
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.date-filter label {
+    font-weight: bold;
+}
+
+.date-filter input[type="date"] {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.date-filter button {
+    padding: 5px 15px;
+    background-color: #07693e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.date-filter button:hover {
+    background-color: #064d2b;
+}
+
+.real-time-date {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+@media screen and (max-width: 768px) {
+    .date-filter {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .date-filter label,
+    .date-filter input,
+    .date-filter button {
+        width: 100%; /* Full width on smaller screens */
+    }
+
+    .date-filter input,
+    .date-filter button {
+        margin-top: 5px;
+    }
+}
+
+
+    </style>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1X0mDsQKoUE-s0cZYJ--AhVwfrgYVZVg",
+            authDomain: "petvac-964a1.firebaseapp.com",
+            databaseURL: "https://petvac-964a1-default-rtdb.firebaseio.com",
+            projectId: "petvac-964a1",
+            storageBucket: "petvac-964a1.firebasestorage.app",
+            messagingSenderId: "140899612152",
+            appId: "1:140899612152:web:ad73d3a9ebcbf28a0b920d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+
+        
+        // Function to load and display vaccination data from Firebase
+        function displayVaccinationData() {
+            const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+            const vaccinationRef = ref(db, 'PetVaccinationReports'); // Reference to vaccination entries in Firebase
+            let rowNumber = 0; // Initialize row number counter
+
+
+
+            // Listen for data in real-time
+            onValue(vaccinationRef, (snapshot) => {
+                dataTableBody.innerHTML = ""; // Clear existing data in table
+                snapshot.forEach((childSnapshot) => {
+                    const entry = childSnapshot.val();
+                    const row = dataTableBody.insertRow();
+
+
+                    // Increment row number
+                    rowNumber++;
+                    // Add row number to the first cell
+                    row.insertCell().textContent = rowNumber;
+
+                    // Add data to the table rows
+                    row.insertCell().textContent = entry.petName;
+                    row.insertCell().textContent = entry.vaccinationDate;
+                    row.insertCell().textContent = entry.barangay;
+                    row.insertCell().textContent = entry.ownerName;
+
+                    row.insertCell().textContent = entry.species;
+                    row.insertCell().textContent = entry.sex;
+                   
+                    row.insertCell().textContent = entry.age;
+                    row.insertCell().textContent = entry.heads;
+                    
+                    row.insertCell().textContent = entry.color;
+                    row.insertCell().textContent = entry.batchNo;
+                    row.insertCell().textContent = entry.vaccineSource;
+                    row.insertCell().textContent = entry.remarks;
+
+                    // Insert the 'Action' cell with 'Edit' and 'Delete' buttons
+                    const actionCell = row.insertCell();
+                    const actionDiv = document.createElement("div");
+                    actionDiv.classList.add("action-buttons");
+
+                    const editButton = document.createElement("button");
+                    editButton.classList.add("edit");
+                    editButton.textContent = "Edit";
+                    // Add event listener to handle the edit functionality
+                    editButton.onclick = function () {
+                        alert("Edit button clicked for " + entry.petName);
+                    };
+
+
+                  
+
+                    // Append buttons to action div and action div to the action cell
+                    actionDiv.appendChild(editButton);
+                  
+                    actionCell.appendChild(actionDiv);
+                });
+            });
+        }
+
+        // Load data on page load
+        window.addEventListener("load", displayVaccinationData);
+
+        let vaccinationData = [];
+
+        function loadVaccinationData() {
+            const vaccinationRef = ref(db, 'PetVaccinationReports');
+            onValue(vaccinationRef, (snapshot) => {
+                vaccinationData = [];
+                snapshot.forEach((childSnapshot) => {
+                    vaccinationData.push(childSnapshot.val());
+                });
+                updateTable(10); // Default to showing 10 entries
+            });
+        }
+
+        function updateTable(entriesToShow) {
+            const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+            dataTableBody.innerHTML = "";
+            const dataToShow = entriesToShow === 'all' ? vaccinationData : vaccinationData.slice(0, entriesToShow);
+
+              // Reset the row number counter
+    let rowNumber = 0;
+
+
+            dataToShow.forEach(entry => {
+                const row = dataTableBody.insertRow();
+
+                  // Add row number
+        rowNumber++;
+        row.insertCell().textContent = rowNumber;
+
+                row.insertCell().textContent = entry.petName;
+                row.insertCell().textContent = entry.vaccinationDate;
+                row.insertCell().textContent = entry.barangay;
+                row.insertCell().textContent = entry.ownerName;
+                row.insertCell().textContent = entry.species;
+                row.insertCell().textContent = entry.sex;
+                row.insertCell().textContent = entry.age;
+                row.insertCell().textContent = entry.heads;
+               
+                row.insertCell().textContent = entry.color;
+                row.insertCell().textContent = entry.batchNo;
+                row.insertCell().textContent = entry.vaccineSource;
+                row.insertCell().textContent = entry.remarks;
+
+                const actionCell = row.insertCell();
+                const actionDiv = document.createElement("div");
+                actionDiv.classList.add("action-buttons");
+
+                const editButton = document.createElement("button");
+                editButton.classList.add("edit");
+                editButton.textContent = "Edit";
+                editButton.onclick = () => alert(`Edit button clicked for ${entry.petName}`);
+                actionDiv.appendChild(editButton);
+
+                const deleteButton = document.createElement("button");
+                deleteButton.classList.add("delete");
+                deleteButton.textContent = "Delete";
+                deleteButton.onclick = () => {
+                    if (confirm("Are you sure you want to delete this entry?")) {
+                        const entryRef = ref(db, 'PetVaccinationReports/' + entry.key);
+                        remove(entryRef).then(() => alert("Entry deleted successfully!"));
+                    }
+                };
+                actionDiv.appendChild(deleteButton);
+                actionCell.appendChild(actionDiv);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadVaccinationData();
+
+            const filterDropdown = document.getElementById("entryFilter");
+            filterDropdown.addEventListener("change", () => {
+                const selectedValue = filterDropdown.value;
+                const entriesToShow = selectedValue === "all" ? "all" : parseInt(selectedValue, 10);
+                updateTable(entriesToShow);
+            });
+        });
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+    loadVaccinationData();
+
+    const filterDropdown = document.getElementById("entryFilter");
+    const dateFilterInput = document.getElementById("dateFilter");
+    const applyFilterButton = document.getElementById("applyFilterButton");
+
+    filterDropdown.addEventListener("change", () => {
+        const selectedValue = filterDropdown.value;
+        const entriesToShow = selectedValue === "all" ? "all" : parseInt(selectedValue, 10);
+        updateTable(entriesToShow);
+    });
+
+    applyFilterButton.addEventListener("click", () => {
+        const selectedDate = dateFilterInput.value;
+        if (!selectedDate) {
+            alert("Please select a date to filter.");
+            return;
+        }
+
+        const filteredData = vaccinationData.filter(entry => entry.vaccinationDate === selectedDate);
+        if (filteredData.length === 0) {
+            alert("No entries found for the selected date.");
+        }
+
+        updateFilteredTable(filteredData);
+    });
+});
+
+function updateFilteredTable(data) {
+    const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+    dataTableBody.innerHTML = "";
+    let rowNumber = 0;
+
+    data.forEach(entry => {
+        const row = dataTableBody.insertRow();
+
+        // Add row number
+        rowNumber++;
+        row.insertCell().textContent = rowNumber;
+
+        // Populate table cells with entry data
+        row.insertCell().textContent = entry.petName;
+        row.insertCell().textContent = entry.vaccinationDate;
+        row.insertCell().textContent = entry.barangay;
+        row.insertCell().textContent = entry.ownerName;
+        row.insertCell().textContent = entry.species;
+        row.insertCell().textContent = entry.sex;
+      
+        row.insertCell().textContent = entry.age;
+        row.insertCell().textContent = entry.heads;
+      
+       row.insertCell().textContent = entry.color;
+        row.insertCell().textContent = entry.batchNo;
+        row.insertCell().textContent = entry.vaccineSource;
+        row.insertCell().textContent = entry.remarks;
+
+        // Add action buttons
+        const actionCell = row.insertCell();
+        const actionDiv = document.createElement("div");
+        actionDiv.classList.add("action-buttons");
+
+        const editButton = document.createElement("button");
+        editButton.classList.add("edit");
+        editButton.textContent = "Edit";
+        editButton.onclick = () => alert(`Edit button clicked for ${entry.petName}`);
+        actionDiv.appendChild(editButton);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = () => {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                const entryRef = ref(db, 'PetVaccinationReports/' + entry.key);
+                remove(entryRef).then(() => alert("Entry deleted successfully!"));
+            }
+        };
+        actionDiv.appendChild(deleteButton);
+        actionCell.appendChild(actionDiv);
+    });
+}
+
+document.getElementById("entryFilter").addEventListener("click", function () {
+    // Reset the date input value
+    document.getElementById("dateFilter").value = "";
+});
+
+document.getElementById("dateFilter").addEventListener("click", function () {
+    // Reset the date input value
+    document.getElementById("entryFilter").value = "";
+});
+
+
+
+
+let currentPage = 1;
+const itemsPerPage = 20; // Number of items to display per page
+
+// Function to render the current page
+function renderPage(pageNumber) {
+    const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+    dataTableBody.innerHTML = ""; // Clear existing data
+
+    const startIndex = (pageNumber - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, vaccinationData.length);
+
+    let rowNumber = startIndex; // Start row number for the current page
+    let totalHeads = 0; // To calculate the total number of heads
+
+    // Render table rows for the current page
+    for (let i = startIndex; i < endIndex; i++) {
+        const entry = vaccinationData[i];
+        const row = dataTableBody.insertRow();
+
+        // Add row number
+        rowNumber++;
+        row.insertCell().textContent = rowNumber;
+
+        // Populate table cells with entry data
+        row.insertCell().textContent = entry.petName || "-";
+        row.insertCell().textContent = entry.vaccinationDate || "-";
+        row.insertCell().textContent = entry.barangay || "-";
+        row.insertCell().textContent = entry.ownerName || "-";
+        row.insertCell().textContent = entry.species || "-";
+        row.insertCell().textContent = entry.sex || "-";
+        row.insertCell().textContent = entry.age || "-";
+
+        // Add heads column and update total
+        const headsValue = parseInt(entry.heads) || 0;
+        totalHeads += headsValue;
+        row.insertCell().textContent = headsValue;
+
+        row.insertCell().textContent = entry.color || "-";
+        row.insertCell().textContent = entry.batchNo || "-";
+        row.insertCell().textContent = entry.vaccineSource || "-";
+        row.insertCell().textContent = entry.remarks || "-";
+
+        // Add action buttons
+        const actionCell = row.insertCell();
+        const actionDiv = document.createElement("div");
+        actionDiv.classList.add("action-buttons");
+
+        const editButton = document.createElement("button");
+        editButton.classList.add("edit");
+        editButton.textContent = "Edit";
+        actionDiv.appendChild(editButton);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete");
+        deleteButton.textContent = "Delete";
+        actionDiv.appendChild(deleteButton);
+
+        actionCell.appendChild(actionDiv);
+    }
+
+    // Add a row at the bottom for total heads
+    const totalRow = dataTableBody.insertRow();
+    totalRow.insertCell().textContent = ""; // Empty cell for row number
+    totalRow.insertCell().textContent = ""; // Empty cell for pet name
+    totalRow.insertCell().textContent = ""; // Empty cell for date
+    totalRow.insertCell().textContent = ""; // Empty cell for barangay
+    totalRow.insertCell().textContent = ""; // Empty cell for owner's name
+    totalRow.insertCell().textContent = ""; // Empty cell for species
+    totalRow.insertCell().textContent = ""; // Empty cell for sex
+    totalRow.insertCell().textContent = ""; // Empty cell for age
+    totalRow.insertCell().textContent = totalHeads; // Total heads value
+    totalRow.insertCell().textContent = ""; // Empty cell for color
+    totalRow.insertCell().textContent = ""; // Empty cell for batch no
+    totalRow.insertCell().textContent = ""; // Empty cell for vaccine source
+    totalRow.insertCell().textContent = ""; // Empty cell for remarks
+    totalRow.insertCell().textContent = ""; // Empty cell for action column
+
+    // Add empty rows to fill the space
+    const totalRows = itemsPerPage;
+    const renderedRows = endIndex - startIndex + 1; // Include total row
+    const emptyRows = totalRows - renderedRows;
+
+    for (let i = 0; i < emptyRows; i++) {
+        const emptyRow = dataTableBody.insertRow();
+        for (let j = 0; j < 14; j++) {
+            emptyRow.insertCell().textContent = ""; // Add empty cells
+        }
+    }
+
+    // Update page number display
+    document.getElementById("pageNumber").textContent = Page ${currentPage};
+}
+
+// Function to handle page change
+function changePage(direction) {
+    const totalPages = Math.ceil(vaccinationData.length / itemsPerPage);
+
+    if (direction === "prev" && currentPage > 1) {
+        currentPage--;
+    } else if (direction === "next" && currentPage < totalPages) {
+        currentPage++;
+    }
+
+    renderPage(currentPage);
+}
+
+// Function to clear rows 21 to 40
+function clearRows21to40() {
+    for (let i = 20; i < Math.min(40, vaccinationData.length); i++) {
+        vaccinationData[i] = null; // Clear data (set to null or remove key-value pairs)
+    }
+
+    // Filter out null entries to reflect changes
+    vaccinationData = vaccinationData.filter(entry => entry !== null);
+
+    // Re-render the current page
+    renderPage(currentPage);
+    alert("Rows 21 to 40 cleared successfully!");
+}
+
+// Function to show total records
+function showTotalRecords() {
+    const totalRecords = vaccinationData.length;
+    alert(`Total Records: ${totalRecords}`);
+}
+
+// Event listeners for pagination controls
+document.getElementById("prevPage").addEventListener("click", () => changePage("prev"));
+document.getElementById("nextPage").addEventListener("click", () => changePage("next"));
+
+// Event listeners for new actions
+document.getElementById("clearRowsButton").addEventListener("click", clearRows21to40);
+document.getElementById("showTotalRecordsButton").adshowTotalRecordsdEventListener("click", );
+
+// Fetch data and initialize pagination on page load
+document.addEventListener("DOMContentLoaded", () => {
+    const vaccinationRef = ref(db, 'PetVaccinationReports');
+    onValue(vaccinationRef, (snapshot) => {
+        vaccinationData = [];
+        snapshot.forEach((childSnapshot) => {
+            vaccinationData.push(childSnapshot.val());
+        });
+
+        // Render the first page
+        renderPage(1);
+    });
+});
+    
+document.getElementById("jsonUpload").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const jsonData = JSON.parse(e.target.result);
+
+                    // Reference the table body
+                    const tableBody = document.getElementById("dataTable").querySelector("tbody");
+                    tableBody.innerHTML = ""; // Clear existing rows
+
+                    // Populate table with JSON data
+                    jsonData.forEach(item => {
+                        const row = document.createElement("tr");
+
+                        // Create cells for each property
+                        row.innerHTML = `
+                            <td>${item.petName}</td>
+                            <td>${item.ownerName}</td>
+                            <td>${item.barangay}</td>
+                            <td>${item.vaccinationDate}</td>
+                            <td>${item.species}</td>
+                            <td>${item.age}</td>
+                            <td>${item.sex}</td>
+                            <td>${item.noHeads}</td>
+                            <td>${item.color}</td>
+                            <td>${item.batchLotNo}</td>
+                            <td>${item.vaccineSource}</td>
+                            <td>${item.remarks}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                };
+
+                reader.readAsText(file);
+            } else {
+                alert("Please select a JSON file.");
+            }
+        });
+    </script>
+    </script>
+
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+        <div class="welcome-container" >
+            <span class="welcome-message"> Pet Vaccination Report </span>
+        </div>
+        
+    </div>
+
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html">
+            <i class="fas fa-tachometer-alt"></i>  Dashboard
+        </a>
+
+        <a href="petprofile.html">
+            <i class="fas fa-paw"></i>  Pet Record
+        </a>
+        <a href="register.html">
+            <i class="fas fa-clipboard-list"></i>  Pet Registration
+        </a>
+
+        <a href="vaccination_input.html">
+            <i class="fas fa-notes-medical"></i>  Pet Vaccination Entry
+        </a>
+
+      
+        <a href="manage_report.html" class="active">
+            <i class="fas fa-chart-bar"></i>  Pet Vaccination Report
+        </a>
+       
+       
+        <a href="offline_mode.html">
+            <i class="fas fa-plug"></i>  Offline Mode
+        </a>
+        <a href="about.html">
+            <i class="fas fa-info-circle"></i>  About
+        </a>
+         <!-- Logout Button -->
+    <a href="#"  id="logoutButton">
+        <i class="fas fa-sign-out-alt"></i>  Logout
+    </a>
+
+    </div>
+
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+
+
+    <div class="headers-section">
+        <div class="logos-container">
+            <img src="img/logo.png" alt="Department of Agriculture Logo" class="header-logo">
+        </div>
+        <h1 class="report-title">Vaccination Report</h1>
+    
+        <div class="headers-row">
+            <div class="headers-left">
+                <p><strong>Province:</strong> Misamis Oriental</p>
+                <p><strong>Date Reported:</strong> August 2022</p>
+            </div>
+            <div class="headers-right">
+                <p><strong>Municipality:</strong> Villanueva</p>
+                <p><strong>Livestock Technician:</strong> Bonifacio Q. Escatron</p>
+            </div>
+        </div>
+    </div>
+    
+        <div class="filter-section-container">
+             <!-- Date Filter -->
+    <div class="filter-item date-filter">
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date">
+
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date">
+
+        <button id="filter-btn">Apply Filter</button>
+        
+            <!-- Show Entries Dropdown -->
+            <div class="filter-item">
+                <label for="entryFilter">Show Entries:</label>
+                <select id="entryFilter">
+                    <option value="all">All Entries</option>
+                    <option value="5">5 Entries</option>
+                    <option value="10">10 Entries</option>
+                    <option value="15">15 Entries</option>
+                </select>
+            </div>
+        
+            <!-- Search Bar -->
+            <div class="filter-item">
+                <label for="petSearch">Search Pet:</label>
+                <input type="text" id="petSearch" placeholder="Search for pet...">
+            </div>
+        
+            <!-- Upload JSON -->
+            <div class="filter-item">
+                <label for="jsonUpload">Upload JSON:</label>
+                <input type="file" id="jsonUpload" accept=".json">
+            </div>
+        
+            <!-- Print Button -->
+            <div class="filter-item">
+                <button onclick="printReport()">Print</button>
+            </div>
+        </div>
+        
+
+        <div class="table-container">
+            <table id="dataTable" class="green-table">
+            <thead>
+                <tr>
+                    <th class="number-column">#</th> <!-- Add a class to the number column -->
+                    <th>Pet Name</th>
+                    <th>Date</th>
+                    <th>Barangay</th>
+
+                    <th>Owner's Name</th>
+
+                    <th>Species</th>
+                    <th>Sex</th>
+                   
+                    <th>Age</th>
+                    <th>No. of Heads</th>
+                   
+                    <th>Color</th>
+                    <th>Batch No</th>
+                    <th>Vaccine Source</th>
+                    <th>Remarks</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be dynamically inserted here by Firebase -->
+            </tbody>
+        </table>
+         <!-- Pagination Controls -->
+         <div id="paginationControls" class="pagination">
+            <button id="prevPage" onclick="changePage('prev')">Prev</button>
+            <span id="pageNumber">Page 1</span>
+            <button id="nextPage" onclick="changePage('next')">Next</button>
+        </div>
+    </div>
+</div>
+        
+        <div class="headers-section">
+            <div class="headers-row">
+                <div class="headers-left">
+                    <p><strong>Submitted by:</strong></p>
+                    <p> Bonifacio Q. Escatron</p>
+                  
+                    <p>Livestock Technician</p>
+              
+                </div>
+                <div class="headers-right">
+                    <p><strong>Noted by:</strong></p>
+                    <p>   Silvestre L. Gorre Jr., PhD</p>
+                    <p>Municipal Agriculturist</p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+    <!-- JavaScript for toggling sidebar -->
+    <script src="js/sidebar.js"></script>
+
+    <script>
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function () {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                const entryRef = ref(db, 'PetVaccinationReports/' + childSnapshot.key);
+                remove(entryRef).then(() => {
+                    alert("Entry deleted successfully!");
+                });
+            }
+        };
+        actionDiv.appendChild(deleteButton);
+
+
+
+
+
+
+
+
+
+
+
+        
+
+    </script>
+</body>
+
+</html>

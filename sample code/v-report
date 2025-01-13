@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Report</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.controls label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+#dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+#dataTable th, #dataTable td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+#dataTable th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+#pagination {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+#pagination button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+#pagination button.active {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+        .print-button {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .print-button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .print-button button:hover {
+            background-color: #45a049;
+        }
+
+        .headers-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            margin-top: 0px;
+
+        }
+
+        .headers-left,
+        .headers-right {
+            display: flex;
+            flex-direction: column;
+            /* Stack items vertically */
+            flex: 1;
+            padding: 0 10px;
+            width: 45%;
+        }
+
+        .signature-area {
+        margin-bottom: 10px;
+    }
+
+    .signature-area p {
+        margin: 0;
+    }
+        .headers-left p,
+        .headers-right p {
+            margin: 5px 0;
+            /* Ensure spacing between lines */
+        }
+
+        .logos-container {
+            flex-shrink: 0;
+            /* Prevents logo from shrinking */
+            margin-right: 10px;
+            /* Space between logo and text */
+        }
+
+        .header-logos {
+            width: 80px;
+            /* Adjust logo size as needed */
+            height: auto;
+            margin-top: 0;
+        }
+
+        @media print {
+
+            .sidebar,
+            .menu-btn,
+            .print-button,
+            .logout-dropdown,
+            #overlay {
+                display: none;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            table th,
+            table td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: center;
+            }
+
+            h1,
+            .headers-section {
+                text-align: center;
+            }
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .filter-container label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .filter-container select {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        /* Style for the number column */
+        .number-column {
+            width: 50px;
+            /* Adjust the width as needed */
+            text-align: center;
+            /* Center-align the numbers */
+        }
+
+        /* Ensure that the content fits the column size */
+        #dataTable td:nth-child(1),
+        #dataTable th:nth-child(1) {
+            text-align: center;
+            width: 20px;
+            /* Match the header column width */
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .filter-section label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .filter-section input[type="date"],
+        .filter-section select {
+            margin-right: 0px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Style for the button */
+        #applyFilterButton {
+            padding: 5px 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #applyFilterButton:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"] {
+        border: 1px solid #ccc;
+        padding: 5px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+    .total-row {
+    font-weight: bold;
+    background-color: #f5f5f5;
+    text-align: right;
+}
+
+    </style>
+
+    <script type="module">
+     
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+        import { get } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-auth.js";
+       
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1X0mDsQKoUE-s0cZYJ--AhVwfrgYVZVg",
+            authDomain: "petvac-964a1.firebaseapp.com",
+            databaseURL: "https://petvac-964a1-default-rtdb.firebaseio.com",
+            projectId: "petvac-964a1",
+            storageBucket: "petvac-964a1.appspot.com",
+            messagingSenderId: "140899612152",
+            appId: "1:140899612152:web:ad73d3a9ebcbf28a0b920d",
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+    // Check if the user is authenticated
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // Redirect to login page if not authenticated
+            window.location.href = 'index.html';
+        }
+    });
+
+    // Logout function
+    document.getElementById('logoutButton').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior (navigation)
+
+        // Show a confirmation prompt
+        const isConfirmed = confirm("Are you sure you want to log out?");
+        
+        // If the user confirms logout, proceed with signing out
+        if (isConfirmed) {
+            try {
+                await signOut(auth); // Sign out the user
+                window.location.href = 'index.html'; // Redirect to login page
+            } catch (error) {
+                console.error("Logout failed: ", error); // Log the error if logout fails
+            }
+        }
+    });
+});
+//end code for logout
+
+//start code for pages, brgy, 
+   // Function to load and display vaccination data from Firebase
+// Initialize variables for pagination
+let currentPage = 1;
+let rowsPerPage = 20;
+let filteredData = []; // Stores the filtered data for pagination
+
+// Function to handle the file upload and insert data into the table
+uploadButton.addEventListener('click', () => {
+    if (jsonUpload.files.length === 0) {
+        alert('Please select a JSON file to upload.');
+        return;
+    }
+
+    if (confirm('Are you sure you want to upload this file?')) {
+        const file = jsonUpload.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            try {
+                const jsonData = JSON.parse(event.target.result);
+                // Assuming jsonData is the array of vaccination reports
+                insertDataIntoFirebase(jsonData);  // Insert data into Firebase
+                alert('File uploaded and data added to the table successfully.');
+
+                // After data is inserted, reload and paginate the data
+                displayVaccinationData();
+            } catch (error) {
+                alert('Invalid JSON file format.');
+            }
+        };
+
+        reader.readAsText(file);
+    }
+});
+
+// Function to insert data into Firebase (assumes you want to add each record as a new entry)
+function insertDataIntoFirebase(data) {
+    const vaccinationRef = ref(db, 'PetVaccinationReports');
+    data.forEach(entry => {
+        // Add each entry to Firebase using push() method
+        push(vaccinationRef, entry).then(() => {
+            console.log('Data inserted into Firebase:', entry);
+        }).catch(error => {
+            console.error('Error inserting data into Firebase:', error);
+        });
+    });
+}
+
+// Function to display vaccination data and handle pagination
+function displayVaccinationData() {
+    const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+    const vaccinationRef = ref(db, 'PetVaccinationReports');
+    let totalHeads = 0;
+
+    onValue(vaccinationRef, (snapshot) => {
+        const allData = [];
+        snapshot.forEach((childSnapshot) => {
+            allData.push({ key: childSnapshot.key, ...childSnapshot.val() });
+        });
+
+        // Apply filtering
+        filterData(allData);
+          // Sort data by vaccinationDate in ascending order
+          filteredData.sort((a, b) => {
+            const dateA = new Date(a.vaccinationDate);
+            const dateB = new Date(b.vaccinationDate);
+            return dateA - dateB; // Ascending order
+        });
+    
+
+        // Paginate and display data
+        paginateData(filteredData);
+    });
+}
+
+
+// Function to filter data based on filters
+function filterData(data) {
+    const barangayFilter = document.getElementById("barangayFilter").value;
+    const petSearch = document.getElementById("petSearch").value.toLowerCase();
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    // Filter data based on selected criteria
+    filteredData = data.filter((entry) => {
+        const matchesBarangay = !barangayFilter || entry.barangay === barangayFilter;
+        const matchesPetName = !petSearch || (entry.petName || "").toLowerCase().includes(petSearch);
+        const matchesDate =
+            (!startDate || new Date(entry.vaccinationDate) >= new Date(startDate)) &&
+            (!endDate || new Date(entry.vaccinationDate) <= new Date(endDate));
+        return matchesBarangay && matchesPetName && matchesDate;
+    });
+
+    currentPage = 1; // Reset to the first page after filtering
+}
+
+// Function to paginate data and update the table
+function paginateData(data) {
+    const dataTableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+    dataTableBody.innerHTML = ""; // Clear the table
+
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginatedData = data.slice(start, end);
+
+    let totalHeads = 0;
+    let rowNumber = start; // Start numbering based on the current page
+
+    paginatedData.forEach((entry, index) => {
+        const row = dataTableBody.insertRow();
+        rowNumber++;
+        totalHeads += parseInt(entry.heads) || 0; // Update total heads count
+
+        row.insertCell().textContent = rowNumber; // Row number
+        row.insertCell().textContent = entry.petName || "";
+        row.insertCell().textContent = entry.vaccinationDate || "";
+        row.insertCell().textContent = entry.barangay || "";
+        row.insertCell().textContent = entry.ownerName || "";
+        row.insertCell().textContent = entry.species || "";
+        row.insertCell().textContent = entry.sex || "";
+        row.insertCell().textContent = entry.age || "";
+        row.insertCell().textContent = entry.heads || "";
+        row.insertCell().textContent = entry.color || "";
+        row.insertCell().textContent = entry.batchNo || "";
+        row.insertCell().textContent = entry.vaccineSource || "";
+        row.insertCell().textContent = entry.remarks || "";
+
+        // Action buttons
+        const actionCell = row.insertCell();
+        const actionDiv = document.createElement("div");
+        actionDiv.classList.add("action-buttons");
+
+        const editButton = document.createElement("button");
+        editButton.classList.add("edit");
+        editButton.textContent = "Edit";
+        editButton.onclick = function () {
+            alert("Edit button clicked for " + entry.petName);
+        };
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function () {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                const entryRef = ref(db, 'PetVaccinationReports/' + entry.key);
+                remove(entryRef).then(() => {
+                    alert("Entry deleted successfully!");
+                    displayVaccinationData(); // Refresh the data in the table
+                });
+            }
+        };
+
+        actionDiv.appendChild(editButton);
+        actionDiv.appendChild(deleteButton);
+        actionCell.appendChild(actionDiv);
+    });
+
+    // Add total heads row
+    const totalRow = dataTableBody.insertRow();
+    totalRow.insertCell().textContent = ""; // Empty cell for row number
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = totalHeads; // Total heads
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+    totalRow.insertCell().textContent = ""; // Empty cell
+
+    updatePaginationControls();
+}
+
+// Function to update pagination controls
+function updatePaginationControls() {
+    const paginationContainer = document.getElementById("paginationControls");
+    paginationContainer.innerHTML = ""; // Clear previous pagination controls
+
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement("button");
+        button.textContent = i;
+        button.classList.add("pagination-button");
+        if (i === currentPage) button.classList.add("active");
+
+        button.addEventListener("click", () => {
+            currentPage = i;
+            paginateData(filteredData);
+        });
+
+        paginationContainer.appendChild(button);
+    }
+}
+
+// Event listeners for filters
+document.getElementById("filterBtn").addEventListener("click", () => {
+    displayVaccinationData();
+});
+
+// Event listener for changing rows per page
+document.getElementById("showEntries").addEventListener("change", (event) => {
+    rowsPerPage = parseInt(event.target.value);
+    currentPage = 1; // Reset to the first page
+    paginateData(filteredData);
+});
+
+// Load data on page load
+window.addEventListener("load", displayVaccinationData);
+
+
+
+//code for technician
+// Reference to the input field
+const technicianNameInput = document.getElementById('technicianName');
+//end code for technician
+
+
+
+// Optional: Add an event listener to log changes or handle updates
+technicianNameInput.addEventListener('input', () => {
+    console.log(`Technician Name Updated: ${technicianNameInput.value}`);
+});
+
+    </script>
+
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+        <div class="welcome-container">
+            <span class="welcome-message"> Pet Vaccination Report </span>
+        </div>
+
+    </div>
+
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="petprofile.html">
+            <i class="fas fa-paw"></i> Pet Record
+        </a>
+        <a href="register.html">
+            <i class="fas fa-clipboard-list"></i> Pet Registration
+        </a>
+
+        <a href="vaccination_input.html">
+            <i class="fas fa-notes-medical"></i> Pet Vaccination Entry
+        </a>
+
+
+        <a href="manage_report.html" class="active">
+            <i class="fas fa-chart-bar"></i> Pet Vaccination Report
+        </a>
+
+
+        <a href="offline_mode.html">
+            <i class="fas fa-plug"></i> Offline Mode
+        </a>
+        <a href="about.html">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+        <!-- Logout Button -->
+        <a href="login.html" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+
+    </div>
+
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;">
+        <!-- Filter by Barangay -->
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label for="barangayFilter" style="margin-bottom: 0; font-size: 14px;">Filter by Barangay:</label>
+            <select id="barangayFilter" name="barangay" style="padding: 5px; height: 30px; width: 120px; font-size: 12px;">
+                <option value="">All Barangays</option>
+                <option value="Balacanas">Balacanas</option>
+                <option value="Dayawan">Dayawan</option>
+                <option value="Imelda">Imelda</option>
+                <option value="Katipunan">Katipunan</option>
+                <option value="Kimaya">Kimaya</option>
+                <option value="Looc">Looc</option>
+                <option value="Poblacion1">Poblacion 1</option>
+                <option value="Poblacion2">Poblacion 2</option>
+                <option value="Poblacion3">Poblacion 3</option>
+                <option value="San_martin">San Martin</option>
+                <option value="Tambobong">Tambobong</option>
+            </select>
+        </div>
+    
+        <!-- Date Range -->
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label for="startDate" style="margin-bottom: 0; font-size: 14px;">Date Range:</label>
+            <input type="date" id="startDate" style="padding: 5px; height: 30px; width: 110px; font-size: 12px;">
+            <span style="white-space: nowrap; font-size: 12px;">to</span>
+            <input type="date" id="endDate" style="padding: 5px; height: 30px; width: 110px; font-size: 12px;">
+        </div>
+    
+        <!-- Show Entries -->
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label for="showEntries" style="margin-bottom: 0; font-size: 14px;">Show Entries:</label>
+            <select id="showEntries" style="padding: 5px; height: 30px; width: 60px; font-size: 12px;">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+    
+        <!-- Filter Button -->
+        <button id="filterBtn" style="padding: 5px 10px; height: 30px; font-size: 12px;">Filter</button>
+    
+        <!-- Pet Name -->
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <label for="petSearch" style="margin-bottom: 0; font-size: 14px;">Pet Name:</label>
+            <input type="text" id="petSearch" placeholder="Search Pet" style="padding: 5px; height: 30px; width: 120px; font-size: 12px;">
+        </div>
+    </div>
+</div>
+
+
+     
+    
+<div style="display: flex; align-items: right inherit; justify-content: space-between; margin-bottom: 10px;">
+    <div class="logos-container">
+                <img src="img/logo.png" alt="Department of Agriculture" class="header-logos">
+            </div>
+        </div>
+    </div>
+
+            <h1 style="text-align: center;">Vaccination Report</h1>
+
+            <div class="headers-row">
+                <div class="headers-left">
+                    <p><strong>Province:</strong> Misamis Oriental</p>
+                    <p>
+                        <label for="dateReported"><strong>Date Reported:</strong></label>
+                        <input type="month" id="dateReportedInput" value="2025-01" style="border: none; font-weight: bold; font-size: 1em;">
+                    </p>
+                </div>
+                <div class="headers-right">
+                    <p><strong>Municipality:</strong> Villanueva</p>
+                    <p>
+                        <strong>Livestock Technician:</strong> 
+                        <input type="text" id="notedBy" value="Bonifacio Q. Escatron" placeholder="Enter name" required>
+                        
+                    </p>  </div>
+            </div>
+        </div>
+
+        
+         <!-- Upload JSON -->
+    <div class="filter-item">
+        <label for="jsonUpload">Choose JSON File:</label>
+        <input type="file" id="jsonUpload" accept=".json" multiple>
+        <button id="uploadButton">Upload JSON</button>
+    </div>
+
+        <table id="dataTable" class="green-table">
+            <thead>
+                <tr>
+                    <th class="number-column">#</th> <!-- Add a class to the number column -->
+                    <th>Pet Name</th>
+                    <th>Date</th>
+                    <th>Barangay</th>
+
+                    <th>Owner's Name</th>
+
+                    <th>Species</th>
+                    <th>Sex</th>
+                  
+                    <th>Age</th>
+                    <th>No. of heads</th>
+                    <th>Color</th>
+                    <th>Batch/Lot No.</th>
+                    <th>Vaccine Source</th>
+                    <th>Remarks</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be dynamically inserted here by Firebase -->
+            </tbody>
+        </table>
+
+       <div id="paginationControls" class="pagination"></div>
+
+        
+        <div class="headers-section">
+            <div class="headers-row">
+                <div class="headers-left">
+                        <p><strong>Submitted by:</strong> 
+                        <input type="text" id="submittedBy" value="Bonifacio Q. Escatron" placeholder="Enter name" required>
+                    </p>
+                    <p>Livestock Technician</p>
+              
+                </div>
+                <div class="headers-right">
+                     <p><strong>Noted by:</strong> 
+                        <input type="text" id="notedBy" value="Silvestre L. Gorre Jr., PhD" placeholder="Enter name" required>
+                    </p>
+                    <p>Municipal Agriculturist</p>
+                </div>
+            </div>
+        </div>
+        
+       
+        
+
+
+        <div class="print-button">
+            <button onclick="printReport()">Print</button>
+        </div>
+    </div>
+
+
+
+
+    <!-- JavaScript for toggling sidebar -->
+    <script src="js/sidebar.js"></script>
+
+    <script>
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function () {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                const entryRef = ref(db, 'PetVaccinationReports/' + childSnapshot.key);
+                remove(entryRef).then(() => {
+                    alert("Entry deleted successfully!");
+                });
+            }
+        };
+        actionDiv.appendChild(deleteButton);
+
+
+
+        document.getElementById('logoutButton').addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent the default link behavior (navigation)
+
+            // Show a confirmation prompt
+            const isConfirmed = confirm("Are you sure you want to log out?");
+
+            // If the user confirms logout, proceed with signing out
+            if (isConfirmed) {
+                try {
+                    // Sign out the user
+                    await signOut(auth);
+
+                    // Redirect to the login page after successful logout
+                    window.location.href = 'login.html'; // Redirect to login page
+                } catch (error) {
+                    // Log the error if logout fails
+                    console.error("Logout failed: ", error);
+                }
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>

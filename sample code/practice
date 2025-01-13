@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload with Metadata</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #e9f5eb;
+            margin: 0;
+            padding: 0;
+            color: #3c4043;
+        }
+        /* Header styling */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #28a745;
+            color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            z-index: 10;
+        }
+        .menu-btn {
+            font-size: 30px;
+            cursor: pointer;
+            background-color: transparent;
+            color: #ffffff;
+            padding: 10px;
+            border: none;
+            margin-left: 20px;
+            margin-right: 15px;
+        }
+        .app-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        /* Sidebar styling */
+        .sidebar {
+            height: 100%;
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: -240px;
+            background-color: #28a745;
+            color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            padding-top: 100px;
+            z-index: 5;
+        }
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #ffffff;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 4;
+        }
+        .form-container {
+            padding: 50px;
+            width: 80%;
+            max-width: 800px;
+            color: #3c4043;
+            margin: 150px auto 40px auto;
+        }
+        #controlsContainer {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #searchBar {
+            display: flex;
+            align-items: rightside;
+            background-color: #e9f5eb;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 5px;
+            color: #3c4043;
+        }
+        #searchIcon {
+            font-size: 18px;
+            color: #28a745;
+            margin-right: 5px;
+        }
+        #searchInput {
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        #imageFolders {
+            margin-top: 20px;
+        }
+        .folder {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f5f5f5;
+        }
+        .folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .folder-content {
+            display: none;
+            padding-bottom: 10px;
+            position: relative;
+        }
+        .toggle-button {
+            cursor: pointer;
+            color: #28a745;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            font-weight: bold;
+            background: none;
+            border: none;
+        }
+        .toggle-button:hover {
+            color: #28a745;
+        }
+        .remove-image-btn {
+            cursor: pointer;
+            color: #28a745;
+            background: none;
+            border: none;
+            font-size: 14px;
+        }
+        .remove-image-btn:hover {
+            color: #28a745;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <span class="app-name">AGRIPETVAX</span>
+    </div>
+
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="vaccination_input.html">Vaccination Record</a>
+        <a href="offline_mode.html">Offline Mode</a>
+        <a href="manage_report.html">Manage Report</a>
+        <a href="documentation.html" class="active">Documentation</a>
+        <a href="about.html">About</a>
+    </div>
+
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+    <div class="form-container">
+        <h2>Documentation</h2>
+        <p>Access all the necessary documentation here. You can find guides, FAQs, and other useful information.</p>
+
+        <div id="controlsContainer">
+            <div id="uploadForm">
+                <input type="file" id="imageInput" multiple accept="image/*">
+                <button id="uploadBtn">Upload</button>
+            </div>
+            <div id="searchBar">
+                <span id="searchIcon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search by date, month, year, or name">
+            </div>
+        </div>
+
+        <div id="imageFolders"></div>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imageFolders = document.getElementById('imageFolders');
+        const searchInput = document.getElementById('searchInput');
+        let storedImages = JSON.parse(localStorage.getItem('uploadedImagesByDate')) || {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            displayImageFolders();
+        });
+
+        uploadBtn.addEventListener('click', function() {
+            const files = imageInput.files;
+            if (files.length === 0) {
+                alert("Please select images to upload.");
+                return;
+            }
+
+            const today = new Date().toLocaleDateString();
+            if (!storedImages[today]) {
+                storedImages[today] = [];
+            }
+
+            for (let file of files) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const imageData = {
+                            src: e.target.result,
+                            name: file.name,
+                            type: file.type,
+                            dimensions: `${img.width} x ${img.height}`,
+                            size: (file.size / 1024).toFixed(2) + ' KB',
+                            date: new Date().toLocaleString()
+                        };
+
+                        storedImages[today].push(imageData);
+                        localStorage.setItem('uploadedImagesByDate', JSON.stringify(storedImages));
+
+                        displayImageFolders();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        searchInput.addEventListener('input', function() {
+            displayImageFolders(searchInput.value.toLowerCase());
+        });
+
+        function displayImageFolders(searchQuery = '') {
+            imageFolders.innerHTML = '';
+            for (const [date, images] of Object.entries(storedImages)) {
+                if (date.toLowerCase().includes(searchQuery) || images.some(img => img.name.toLowerCase().includes(searchQuery))) {
+                    const folderDiv = document.createElement('div');
+                    folderDiv.classList.add('folder');
+                    
+                    folderDiv.innerHTML = `
+                        <div class="folder-header">
+                            <span><strong>${date}</strong></span>
+                            <button class="toggle-button" onclick="toggleFolder('${date}', this)">View</button>
+                        </div>
+                        <div class="folder-content" id="folder-${date}">
+                              ${images.map((image, index) => `
+                                <div class="image-container">
+                                    <img src="${image.src}" alt="${image.name}" width="50">
+                                    <span>${image.name}</span> - ${image.dimensions}, ${image.size}
+                                    <button class="remove-image-btn" onclick="removeImage('${date}', ${index})">Remove</button>
+                                </div>`).join('')}
+                        </div>
+                    `;
+                    imageFolders.appendChild(folderDiv);
+                }
+            }
+        }
+
+        function toggleFolder(date, button) {
+            const folderContent = document.getElementById(`folder-${date}`);
+            const isOpen = folderContent.style.display === 'block';
+            
+            folderContent.style.display = isOpen ? 'none' : 'block';
+            button.textContent = isOpen ? 'View' : 'Back';
+        }
+
+        function removeImage(date, index) {
+            if (confirm('Are you sure you want to remove this image?')) {
+                storedImages[date].splice(index, 1); // Remove the specific image from the array
+                localStorage.setItem('uploadedImagesByDate', JSON.stringify(storedImages));
+                displayImageFolders(); // Re-render the image list after removal
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+<style>
+    /* Container for all rows */
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0; /* Ensure no gap between rows and columns */
+        justify-content: space-between; /* Distribute columns evenly */
+        margin: 0; /* Remove default margins */
+        padding: 0; /* Remove padding */
+        width: 100%; /* Ensure both columns take equal width */
+      
+    }
+    
+    /* Individual squares (boxes) */
+    .table-container {
+        width: 48%; /* Ensure both columns take equal width */
+        height: auto; /* Let the height adjust according to content */
+        box-sizing: border-box;
+        border: 1px solid #ccc; /* Border for the squares */
+        padding: 10px;
+        background-color: #f9f9f9;
+        margin-bottom: 0; /* Remove bottom margin to eliminate space between rows */
+    }
+    
+    /* Green title for details table */
+    .table-container h2 {
+        color: green; /* Green color for the title */
+       
+        font-size: 1.2em; /* Adjust title font size */
+        margin-bottom: 10px; /* Tighten space below the title */
+    }
+    
+    /* Table styles inside the containers */
+    table {
+        width: 100%; /* Table takes up 100% of the container's width */
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.50em; /* Reduce font size to fit */
+        margin-top: 0; /* Remove margin-top to ensure tightness */
+    }
+    
+    th, td {
+        border: 1px solid #ccc;
+        padding: 6px 10px; /* Reduced padding to make table fit */
+    }
+    
+    th {
+        background-color: #f4f4f4;
+    }
+    
+    /* Action Button Styles */
+    button.view-btn {
+        font-size: 0.8em; /* Smaller button text */
+        padding: 4px 8px; /* Reduced button padding */
+        background-color: #4CAF50; /* Green button */
+        color: white;
+        border: none;
+        cursor: pointer;
+        align-items: center;
+       
+      
+    }
+    
+    button.view-btn:hover {
+        background-color: #45a049; /* Darker green on hover */
+    }
+    
+    .vaccinationTableBody {
+                margin-bottom: 20px;
+            }
+    
+            .vaccinationTableBody div {
+                margin-bottom: 10px;
+                font-size: 0.9em;
+            }
+    
+            .vaccinationTableBody span {
+                font-weight: bold;
+            }
+    /* Optional: Add styles for responsiveness */
+    @media (max-width: 768px) {
+        .table-container {
+            width: 100%; /* Stack on small screens */
+        }
+        
+        table {
+            width: 100%; /* Table adjusts to fit container */
+        }
+        
+        button.view-btn {
+            font-size: 0.9em; /* Slightly larger button on small screens */
+        }
+    }
+    td:first-child {
+     
+        width: 30%;
+        text-align: left;
+       
+    }
+    td:last-child {
+        width: 70%;
+    }
+    
+        </style>
+      <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1X0mDsQKoUE-s0cZYJ--AhVwfrgYVZVg",
+            authDomain: "petvac-964a1.firebaseapp.com",
+            databaseURL: "https://petvac-964a1-default-rtdb.firebaseio.com",
+            projectId: "petvac-964a1",
+            storageBucket: "petvac-964a1.appspot.com",
+            messagingSenderId: "140899612152",
+            appId: "1:140899612152:web:ad73d3a9ebcbf28a0b920d",
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            const petTableBody = document.querySelector("#petTable tbody");
+            const vaccinationTableBody = document.querySelector("#vaccinationTable tbody");
+            const vaccinationTableContainer = document.querySelector("#vaccinationTable").closest(".table-container");
+    
+            // Load pet data and populate the main table
+            function loadPetData() {
+                const petRef = ref(db, "register");
+    
+                onValue(petRef, (snapshot) => {
+                    petTableBody.innerHTML = ""; // Clear table
+                    snapshot.forEach((childSnapshot) => {
+                        const petData = childSnapshot.val();
+                        const row = document.createElement("tr");
+    
+                        // Populate the table row with pet data
+                        row.innerHTML = `
+                            <td>${petData.petName}</td>
+                            <td>${petData.ownerName}</td>
+                            <td>${petData.barangay}</td>
+                         
+                            <td>${petData.species}</td>
+                            <td>${petData.age}</td>
+                            <td>${petData.sex}</td>
+                            <td>${petData.color}</td>
+                            <td><button class="view-btn">View</button></td>
+                        `;
+    
+                        // Add click event for the "View" button
+                        row.querySelector(".view-btn").addEventListener("click", () => {
+                            showVaccinationDetails(petData);
+                        });
+                        petTableBody.appendChild(row);
+                    });
+                });
+            }
+    
+           // Show vaccination details for a selected pet
+    function showVaccinationDetails(petData) {
+        // Clear the vaccination table
+        vaccinationTableBody.innerHTML = `
+            <table border="1">
+                <tr>
+                    <td><strong>Pet Name</strong></td>
+                    <td>${petData.petName || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td><strong>Owner's Name</strong></td>
+                    <td>${petData.ownerName || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td><strong>Barangay</strong></td>
+                    <td>${petData.barangay || 'N/A'}</td>
+                </tr>
+                <tr>
+                    
+                </tr>
+                <tr>
+                    <td style="font-size:15px "><strong>Vaccination Details</strong></td>
+                    <td></td>
+                </tr>
+                <tr>
+                   
+                    <th>${petData.vaccinationDate || 'N/A'}</th>
+                
+                    <td><strong>Batch</strong></td>
+                    <td>${petData.batchNo || 'N/A'}</td>
+               
+                    <td><strong>Vaccine Source</strong></td>
+                    <td>${petData.vaccineSource || 'N/A'}</td>
+                </tr>
+            </table>
+        `;
+    
+    
+    
+                // Show the vaccination table
+                vaccinationTableContainer.classList.remove("hidden");
+            }
+    
+            // Load data when the page loads
+            loadPetData();
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaccination</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+
+
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+    
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1X0mDsQKoUE-s0cZYJ--AhVwfrgYVZVg",
+  authDomain: "petvac-964a1.firebaseapp.com",
+  databaseURL: "https://petvac-964a1-default-rtdb.firebaseio.com",
+  projectId: "petvac-964a1",
+  storageBucket: "petvac-964a1.firebasestorage.app",
+  messagingSenderId: "140899612152",
+  appId: "1:140899612152:web:ad73d3a9ebcbf28a0b920d"
+ };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+
+        // Extract the petName from the query parameters
+        const params = new URLSearchParams(window.location.search);
+        const petName = params.get("petName");
+
+        
+   // Add event listener to the form for submitting data
+document.getElementById("entryForm").addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent default form submission
+  
+    // Get form data
+    const petName = document.getElementById("pet_name").value;
+    const ownerName = document.getElementById("owner_name").value;
+    const barangay = document.getElementById("barangay").value;
+    const species = document.getElementById("species").value;
+    const ageNumber = document.getElementById("age_number").value;
+    const ageUnit = document.getElementById("age_unit").value;
+    const sex = document.getElementById("sex").value;
+    const color = document.getElementById("color").value;
+    const date = document.getElementById("date").value;
+    const batchNo = document.getElementById("batch_lot_no").value;
+    const vaccineSource = document.getElementById("vaccine_source").value;
+    const remarks = document.getElementById("remarks").value;
+
+    // Prepare the data to be saved
+    const vaccinationData = {
+        petName,
+        ownerName,
+        barangay,
+        species,
+        age: `${ageNumber} ${ageUnit}`,
+        sex,
+        color,
+        vaccinationDate: date,
+        batchNo,
+        vaccineSource,
+        remarks
+    };
+
+    // Save the data to Firebase under 'vaccinationEntries'
+    const vaccinationRef = ref(db, 'vaccinationEntries/' + petName); // Use petName as the key
+    set(vaccinationRef, vaccinationData).then(() => {
+        alert("Vaccination data saved successfully!");
+    }).catch((error) => {
+        console.error("Error saving vaccination data:", error);
+        alert("Error saving data, please try again.");
+    });
+});
+
+</script>
+
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+
+        <div class="welcome-container" onclick="toggleLogoutDropdown()">
+            <img src="img/username.png" alt="Username Icon" class="user-icon">
+            <span class="welcome-message">Welcome, Admin</span>
+        </div>
+
+        <div id="logoutDropdown" class="logout-dropdown">
+            <button id="logoutButton">
+                <img src="img/logout.png" alt="Logout Icon" class="logout-icon">
+                Logout
+            </button>
+        </div>
+    </div>
+
+  
+  <!-- Sidebar -->
+  <div id="mySidebar" class="sidebar">
+    <a href="dashboard.html" >
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+
+    <a href="petprofile.html" >
+        <i class="fas fa-paw"></i> Pet Profile
+    </a>
+    <a href="register.html">
+        <i class="fas fa-clipboard-list"></i> Registration
+    </a>
+
+    <a href="vaccination_input.html" class="active">
+        <i class="fas fa-notes-medical"></i> Vaccination Entry
+    </a>
+   
+    <a href="offline_mode.html">
+        <i class="fas fa-plug"></i> Offline Mode
+    </a>
+    <a href="manage_report.html">
+        <i class="fas fa-chart-bar"></i> Vaccination Report
+    </a>
+    <a href="documentation.html">
+        <i class="fas fa-book"></i> Documentation
+    </a>
+    <a href="about.html">
+        <i class="fas fa-info-circle"></i> About
+    </a>
+</div>
+
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+    <h1>Vaccination Form</h1>
+   
+    <!-- Form Container -->
+    <div class="form-container">
+       
+       <form id="entryForm">
+            <div class="grid-container">
+                <!-- Pet Details -->
+                <div class="form-group">
+                    <label for="pet_name">Pet Name</label>
+                    <input type="text" id="pet_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="owner_name">Owner's Name</label>
+                    <input type="text" id="owner_name"required>
+                </div>
+                <div class="form-group">
+                    <label for="barangay">Barangay</label>
+                    <select id="barangay" name="barangay"required>
+                        <option value="balacanas">Balacanas</option>
+                        <option value="dayawan">Dayawan</option>
+                        <option value="imelda">Imelda</option>
+                        <option value="katipunan">Katipunan</option>
+                        <option value="kimaya">Kimaya</option>
+                        <option value="looc">Looc</option>
+                        <option value="poblacion1">Poblacion 1</option>
+                        <option value="poblacion2">Poblacion 2</option>
+                        <option value="poblacion3">Poblacion 3</option>
+                        <option value="san_martin">San Martin</option>
+                        <option value="tambobong">Tambobong</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="species">Species</label>
+                    <select id="species" required>
+                        <option value="Canine">Canine</option>
+                        <option value="Feline">Feline</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <div class="age-selector">
+                        <select id="age_number" name="age_number" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                        <select id="age_unit" required>
+                            <option value="Month(s)">Month(s)</option>
+                            <option value="Year(s)">Year(s)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sex">Sex</label>
+                    <select id="sex" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="batch_lot_no">Batch No</label>
+                    <input type="text" id="batch_lot_no" required>
+                </div>
+                <div class="form-group">
+                    <label for="vaccine_source">Vaccine Source</label>
+                    <input type="text" id="vaccine_source" required>
+                </div>
+                <div class="form-group">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" rows="4"></textarea>
+                </div>
+                <div class="button-container">
+                
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    
+   
+
+
+
+    <!-- JavaScript for toggling sidebar -->
+    <script>
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById("mySidebar");
+            const overlay = document.getElementById("overlay");
+
+            // Toggle sidebar and overlay visibility
+            if (sidebar.style.left === "-240px" || !sidebar.style.left) {
+                sidebar.style.left = "0";
+                overlay.style.display = "block"; // Show overlay
+            } else {
+                closeSidebar();
+            }
+        }
+
+        // Close sidebar when clicking outside
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.left = "-240px";
+            document.getElementById("overlay").style.display = "none"; // Hide overlay
+        }
+
+        // Close sidebar when clicking on overlay
+        document.getElementById("overlay").addEventListener("click", closeSidebar);
+   
+   
+
+      
+   
+   </script>
+
+</body>
+
+</html>
+
+<div class="real-time-date" id="realTimeDate"></div>
+
+
+/* Real-Time Date Styling */
+.real-time-date {
+    font-size: 18px;
+    font-weight: bold;
+    color: #18621a;
+    margin-bottom: 20px;
+    padding-top: 80px;
+}
+
+entryForm.reset();

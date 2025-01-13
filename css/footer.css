@@ -1,0 +1,39 @@
+/* Footer */
+footer {
+    background-color: #07693e;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 1500px;  /* Set a maximum width for large screens */
+    margin: 0 auto;     /* Center the footer on the page */
+    box-sizing: border-box;
+}
+
+footer a {
+    color: #5b5bc8;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design for Footer */
+@media (max-width: 768px) {
+    footer {
+        padding: 20px 30px;
+    }
+    footer a {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    footer {
+        padding: 20px 10px;
+    }
+    footer a {
+        font-size: 12px;
+    }
+}

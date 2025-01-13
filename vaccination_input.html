@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Vaccination Entry</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        
+        /* Success Prompt Styling */
+        .success-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            /* Hidden by default */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .prompt-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+        }
+
+        .prompt-content p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-content button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .prompt-content button:hover {
+            background-color: #218838;
+        }
+
+        .prompt-content button:focus {
+            outline: none;
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+      
+
+        #searchModal {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            background-color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        #searchTable tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+       /* Auto-fill button styling */
+.autofill-btn {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Padding */
+
+    font-size: 14px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.autofill-btn:hover {
+    background-color: #45a049; /* Darker green when hovered */
+}
+
+.autofill-btn:focus {
+    outline: none; /* Remove focus outline */
+}
+
+
+
+         /* Success Prompt Styling */
+         .res{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            /* Hidden by default */
+            background-color: rgba(0, 0, 0, 0.5);
+             /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+
+        #modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#modalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+#closeModal {
+    margin-top: 10px;
+}
+
+
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+}
+
+.search-bar button {
+  padding: 8px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.search-bar button:hover {
+  background-color: #0056b3;
+}
+
+/* Close button styling to match the autofill button */
+#closeModal {
+    background-color: #f44336; /* Red background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Same padding as the autofill button */
+    font-size: 16px; /* Same font size as the autofill button */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    margin-top: 10px; /* Space above the button */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+#closeModal:hover {
+    background-color: #d32f2f; /* Darker red when hovered */
+}
+
+#closeModal:focus {
+    outline: none; /* Remove focus outline */
+}
+ 
+    </style>
+
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getDatabase, ref, onValue,remove,update, get,set, push, child} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
+            authDomain: "agripetvax-e0902.firebaseapp.com",
+            databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
+            projectId: "agripetvax-e0902",
+            storageBucket: "agripetvax-e0902.firebasestorage.app",
+            messagingSenderId: "6172388895",
+            appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
+            measurementId: "G-PXXRWD5715"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+  
+
+        document.addEventListener('DOMContentLoaded', () => {
+    // Check if the user is authenticated
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // Redirect to login page if not authenticated
+            window.location.href = 'index.html';
+        }
+    });
+
+    // Logout function
+    document.getElementById('logoutButton').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior (navigation)
+
+        // Show a confirmation prompt
+        const isConfirmed = confirm("Are you sure you want to log out?");
+        
+        // If the user confirms logout, proceed with signing out
+        if (isConfirmed) {
+            try {
+                await signOut(auth); // Sign out the user
+                window.location.href = 'index.html'; // Redirect to login page
+            } catch (error) {
+                console.error("Logout failed: ", error); // Log the error if logout fails
+            }
+        }
+    });
+});
+// END CODE FOR LOG OUT
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const vaccinationForm = document.getElementById("vaccinationForm");
+            const successPrompt = document.getElementById("successPrompt");
+            const entryForm = document.getElementById("entryForm");
+
+
+         // Get the query string from the URL
+const urlParams = new URLSearchParams(window.location.search);
+
+// Retrieve the values from the URL parameters
+const petName = urlParams.get('petName');
+const ownerName = urlParams.get('ownerName');
+const barangay = urlParams.get('barangay');
+const species = urlParams.get('species');
+const sex = urlParams.get('sex');
+const age = urlParams.get('age');
+const heads = urlParams.get('heads');
+const color = urlParams.get('color');
+
+// Log to check if the values are being retrieved correctly
+console.log(petName, ownerName, barangay, species, sex, age, heads, color);
+
+// Autofill the form fields if the parameters exist
+document.getElementById("pet_name").value = petName || '';  // Fallback to empty string if undefined
+document.getElementById("owner_name").value = ownerName || '';
+document.getElementById("barangay").value = barangay || '';
+document.getElementById("species").value = species || '';
+document.getElementById("sex").value = sex || '';
+
+// Fill in the age fields (age number and unit)
+if (age) {
+    const ageParts = age.split(" "); // Split the age value into number and unit
+    if (ageParts.length > 1) {
+        document.getElementById("age_number").value = ageParts[0]; // Set numeric part
+        document.getElementById("age_unit").value = ageParts[1]; // Set unit part (e.g., Year(s) or Month(s))
+    }
+}
+
+// Autofill heads and color
+document.getElementById("heads").value = heads || '';  // Fallback to empty string if undefined
+document.getElementById("color").value = color || '';  // Fallback to empty string if undefined
+            // Set default vaccination date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('vaccinationDate').value = today;
+
+            vaccinationForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const vaccinationData = {
+                    petName: document.getElementById("pet_name").value,
+                    vaccinationDate: document.getElementById("vaccinationDate").value,
+
+                    barangay: document.getElementById("barangay").value,
+
+                    ownerName: document.getElementById("owner_name").value,
+                    species: document.getElementById("species").value,
+                    age: document.getElementById("age").value,
+                    sex: document.getElementById("sex").value,
+                    heads: document.getElementById("heads").value,
+
+                    color: document.getElementById("color").value,
+
+                    batchNo: document.getElementById("batch_lot_no").value,
+                    vaccineSource: document.getElementById("vaccine_source").value,
+                    remarks: document.getElementById("remarks").value,
+
+
+                };
+
+                saveVaccinationData(vaccinationData);
+            });
+        });
+
+
+
+        // Add event listener to the form for submitting data
+        document.getElementById("entryForm").addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const petName = document.getElementById("pet_name").value;
+            const vaccinationDate = document.getElementById("date").value;
+
+            const barangay = document.getElementById("barangay").value;
+            const ownerName = document.getElementById("owner_name").value;
+
+            const species = document.getElementById("species").value;
+            const sex = document.getElementById("sex").value;
+
+            const ageNumber = document.getElementById("age_number").value;
+            const ageUnit = document.getElementById("age_unit").value;
+            const heads = document.getElementById("heads").value;
+          
+            const color = document.getElementById("color").value;
+            const batchNo = document.getElementById("batch_lot_no").value;
+            const vaccineSource = document.getElementById("vaccine_source").value;
+            const remarks = document.getElementById("remarks").value;
+
+            // Prepare the data to be saved
+            const vaccinationData = {
+                petName,
+                vaccinationDate: date,
+                barangay,
+                ownerName,
+
+                species,
+                age: `${ageNumber} ${ageUnit}`,
+                sex,
+                heads,
+                color,
+                batchNo,
+                vaccineSource,
+                remarks
+            };
+
+            function saveVaccinationData(data) {
+    const vaccinationRef = ref(db, 'PetVaccinationReports/' + data.petName + "_" + new Date().toISOString()); // Use a timestamp to create a unique entry
+
+    set(vaccinationRef, data)
+        .then(() => {
+            successPrompt.style.display = "flex"; // Show success prompt
+        })
+        .catch((error) => {
+            console.error("Error saving vaccination data: ", error);
+            alert("Error saving vaccination data. Please try again.");
+        });
+}
+
+        });
+        entryForm.addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent page reload
+
+            // Collect form data
+            const vaccinationData = {
+                petName: document.getElementById("pet_name").value,
+                vaccinationDate: document.getElementById("vaccinationDate").value,
+                barangay: document.getElementById("barangay").value,
+                ownerName: document.getElementById("owner_name").value,
+                species: document.getElementById("species").value,
+                age: `${document.getElementById("age_number").value} ${document.getElementById("age_unit").value}`,
+                sex: document.getElementById("sex").value,
+                heads: document.getElementById("heads").value,
+            
+                color: document.getElementById("color").value,
+                batchNo: document.getElementById("batch_lot_no").value,
+                vaccineSource: document.getElementById("vaccine_source").value,
+                remarks: document.getElementById("remarks").value,
+            };
+
+            // Save the data
+            saveVaccinationData(vaccinationData);
+        });
+
+        function saveVaccinationData(data) {
+            const vaccinationRef = ref(db, 'PetVaccinationReports/' + data.petName + "_" + data.vaccinationDate);
+
+            set(vaccinationRef, data)
+                .then(() => {
+                    successPrompt.style.display = "flex"; // Show success prompt
+                })
+                .catch((error) => {
+                    console.error("Error saving vaccination data: ", error);
+                    alert("Error saving vaccination data. Please try again.");
+                });
+        }
+
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const dateInput = document.getElementById("vaccinationDate");
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
+            dateInput.value = today; // Set today's date as the default value
+        });
+
+
+      // Get the reference to the "register" node in the database
+const petRef = ref(db, "register");
+
+// Function to search for pets based on input
+function searchPets() {
+    const searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    if (!searchInput) {
+        alert("Please enter a search term.");
+        return;
+    }
+
+    // Get data from Firebase
+    get(petRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            const pets = snapshot.val();
+            const filteredPets = [];
+
+            // Filter pets based on the search term
+            for (const petId in pets) {
+                const pet = pets[petId];
+                if (pet.petName && pet.petName.toLowerCase().includes(searchInput)) {
+                    filteredPets.push(pet);
+                }
+            }
+
+            renderTable(filteredPets);
+            showModal();  // Show the modal after rendering the table
+        } else {
+            alert("No pets found in the database.");
+        }
+    }).catch((error) => {
+        console.error("Error fetching data: ", error);
+        alert("Error fetching data. Please try again.");
+    });
+}
+
+// Function to render the table with search results
+function renderTable(pets) {
+    const tableBody = document.querySelector("#resultsTable tbody");
+    tableBody.innerHTML = ""; // Clear previous results
+
+    if (pets.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='5'>No results found.</td></tr>";
+        return;
+    }
+
+    pets.forEach(pet => {
+        const row = document.createElement("tr");
+
+        // Create cell for Pet Name
+        const petNameCell = document.createElement("td");
+        petNameCell.textContent = pet.petName;
+
+        // Create cell for Owner's Name
+        const ownersnameCell = document.createElement("td");
+        ownersnameCell.textContent = pet.ownerName;
+
+        // Create cell for Barangay
+        const barangayCell = document.createElement("td");
+        barangayCell.textContent = pet.barangay;
+
+        // Create cell for Species
+        const speciesCell = document.createElement("td");
+        speciesCell.textContent = pet.species;
+
+        // Create cell for Auto-fill button (5th column)
+        const actionCell = document.createElement("td");
+        const autofillButton = document.createElement("button");
+        autofillButton.textContent = "Auto-fill";
+        autofillButton.classList.add("autofill-btn");
+
+        autofillButton.addEventListener("click", () => {
+    // Fill the form with pet details
+    document.getElementById("pet_name").value = pet.petName;
+    document.getElementById("owner_name").value = pet.ownerName;
+    document.getElementById("barangay").value = pet.barangay;
+    document.getElementById("species").value = pet.species;
+    document.getElementById("sex").value = pet.sex;
+    document.getElementById("color").value = pet.color;
+    document.getElementById("heads").value = pet.heads;
+
+    // Auto-fill the age based on the pet's age
+    const ageParts = pet.age ? pet.age.split(" ") : [];
+    if (ageParts.length > 1) {
+        document.getElementById("age_number").value = ageParts[0]; // Numeric part (e.g., 3)
+        document.getElementById("age_unit").value = ageParts[1]; // Unit part (e.g., Year(s) or Month(s))
+    } else {
+        document.getElementById("age_number").value = pet.age || ''; // In case there's no "unit"
+        document.getElementById("age_unit").value = ''; // Clear unit if only a number is provided
+    }
+});
+
+
+
+        actionCell.appendChild(autofillButton);
+
+        // Append all cells to the row
+        row.appendChild(petNameCell);
+        row.appendChild(ownersnameCell);
+        row.appendChild(barangayCell);
+        row.appendChild(speciesCell);
+        row.appendChild(actionCell); // Append the autofill button column
+
+        // Append the row to the table body
+        tableBody.appendChild(row);
+    });
+}
+
+// Function to show the modal
+function showModal() {
+    const modal = document.getElementById("modal");
+    modal.style.display = "flex"; // Display the modal
+}
+
+// Event listener for the close button
+document.getElementById("closeModal").addEventListener("click", () => {
+    const modal = document.getElementById("modal");
+    modal.style.display = "none"; // Hide the modal when close button is clicked
+});
+
+// Add event listener for the search button
+document.getElementById("searchButton").addEventListener("click", searchPets);
+
+   
+// Function to autofill and submit new vaccination details
+function handleAutofillAndSubmit(pet) {
+    // Fill the form with pet details
+    document.getElementById("pet_name").value = pet.petName;
+    document.getElementById("owner_name").value = pet.ownerName;
+    document.getElementById("barangay").value = pet.barangay;
+    document.getElementById("species").value = pet.species;
+    document.getElementById("sex").value = pet.sex;
+    document.getElementById("color").value = pet.color;
+    document.getElementById("heads").value = pet.heads;
+
+    // Auto-fill the age based on the pet's age
+    const ageParts = pet.age ? pet.age.split(" ") : [];
+    if (ageParts.length > 1) {
+        document.getElementById("age_number").value = ageParts[0]; // Numeric part (e.g., 3)
+        document.getElementById("age_unit").value = ageParts[1]; // Unit part (e.g., Year(s) or Month(s))
+    } else {
+        document.getElementById("age_number").value = pet.age || ''; // In case there's no "unit"
+        document.getElementById("age_unit").value = ''; // Clear unit if only a number is provided
+    }
+
+    // Automatically submit the vaccination details form after autofill
+    submitVaccinationDetails();
+}
+
+// Function to submit new vaccination details to Firebase
+function submitVaccinationDetails() {
+    // Get form data
+    const vaccinationDate = document.getElementById("vaccination_date").value;
+    const batchNo = document.getElementById("batch_no").value;
+    const vaccineSource = document.getElementById("vaccine_source").value;
+    const remarks = document.getElementById("remarks").value;
+
+    // Push new vaccination data to Firebase
+    const vaccinationData = {
+        vaccinationDate,
+        batchNo,
+        vaccineSource,
+        remarks,
+        petName: document.getElementById("pet_name").value, // Include pet name to link it
+        ownerName: document.getElementById("owner_name").value, // Include owner name
+        barangay: document.getElementById("barangay").value, // Include barangay
+        species: document.getElementById("species").value, // Include species
+        sex: document.getElementById("sex").value, // Include sex
+        color: document.getElementById("color").value, // Include color
+        heads: document.getElementById("heads").value, // Include heads
+        age: document.getElementById("age_number").value + " " + document.getElementById("age_unit").value // Include age
+    };
+
+    // Get the reference for the vaccinations
+    const vaccinationsRef = ref(db, 'PetVaccinationReports');
+
+    // Push the new vaccination data with a unique ID under the PetVaccinationReports node
+    push(vaccinationsRef, vaccinationData)
+        .then(() => {
+            alert("Vaccination details submitted successfully!");
+            // Optionally, refresh the table to include the new data
+            showVaccinationDetails(vaccinationData); // Refresh the table with new details
+        })
+        .catch((error) => {
+            alert("Error submitting vaccination details: " + error.message);
+        });
+}
+
+// Add event listener to autofill button
+autofillButton.addEventListener("click", () => {
+    handleAutofillAndSubmit(pet);  // Call the function to autofill and submit details
+});
+
+
+   </script>
+
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+        <div class="welcome-container">
+            <span class="welcome-message"> Pet Vaccination Entry </span>
+        </div>
+
+    </div>
+
+
+
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="petprofile.html">
+            <i class="fas fa-paw"></i> Pet Record
+        </a>
+        <a href="register.html">
+            <i class="fas fa-clipboard-list"></i> Pet Registration
+        </a>
+
+        <a href="vaccination_input.html" class="active">
+            <i class="fas fa-notes-medical"></i> Pet Vaccination Entry
+        </a>
+
+
+        <a href="manage_report.html" >
+            <i class="fas fa-chart-bar"></i> Pet Vaccination Report
+        </a>
+
+
+        <a href="about.html">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+        <!-- Logout Button -->
+        <a href="#" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+
+    </div>
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h1 style="text-align: center; margin-bottom:5%;">Pet Vaccination Form</h1>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Enter pet name to search...">
+            <button id="searchButton">Search</button>
+        </div>
+
+     <!-- Modal/Prompt Container -->
+<div id="modal" style="display:none;">
+    <div id="modalContent">
+        <h3>Search Results</h3>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Pet Name</th>
+                    <th>Owner's Name</th>
+                    <th>Barangay</th>
+                    <th>Species</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be added dynamically here -->
+            </tbody>
+        </table>
+        <button id="closeModal">Close</button>
+    </div>
+</div>
+
+
+        <form id="entryForm">
+            <div class="grid-container">
+                <!-- Pet Details -->
+                <div class="form-group">
+                    <label for="pet_name">Pet Name</label>
+                    <input type="text" id="pet_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="owner_name">Owner's Name</label>
+                    <input type="text" id="owner_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="barangay">Barangay</label>
+                    <select id="barangay" name="barangay" required>
+                        <option value="Balacanas">Balacanas</option>
+                        <option value="Dayawan">Dayawan</option>
+                        <option value="Imelda">Imelda</option>
+                        <option value="Katipunan">Katipunan</option>
+                        <option value="Kimaya">Kimaya</option>
+                        <option value="Looc">Looc</option>
+                        <option value="Poblacion1">Poblacion 1</option>
+                        <option value="Poblacion2">Poblacion 2</option>
+                        <option value="Poblacion3">Poblacion 3</option>
+                        <option value="San_martin">San Martin</option>
+                        <option value="Tambobong">Tambobong</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="species">Species</label>
+                    <select id="species" required>
+                        <option value="Canine">Canine</option>
+                        <option value="Feline">Feline</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sex">Sex</label>
+                    <select id="sex" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <div class="age-selector">
+                        <select id="age_number" name="age_number" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                        <select id="age_unit" required>
+                            <option value="Month(s)">Month(s)</option>
+                            <option value="Year(s)">Year(s)</option>
+                        </select>
+                    </div>
+                </div>
+              
+                <div class="form-group">
+                    <label for="heads">No. of Heads</label>
+                              <select id="heads" name="heads" required>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                  
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" required>
+                </div>
+                <div class="form-group">
+                    <label for="vaccinationDate">Date</label>
+                    <input type="date" id="vaccinationDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="batch_lot_no">Batch No</label>
+                    <input type="text" id="batch_lot_no" required>
+                </div>
+                <div class="form-group">
+                    <label for="vaccine_source">Vaccine Source</label>
+                    <input type="text" id="vaccine_source" required>
+                </div>
+                <div class="form-group">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" rows="1"></textarea>
+                </div>
+                <div class="button-container">
+
+                    <button type="submit">Submit</button>
+                </div>
+                       
+    </div>
+        </form>
+
+
+
+    <!-- Success Prompt Modal -->
+    <div id="successPrompt" class="success-prompt">
+        <div class="prompt-content">
+            <p>Vaccination successfully recorded!</p>
+            <button onclick="window.location.href = 'manage_report.html'">Go to Vaccination Report</button>
+        </div>
+    </div>
+
+
+
+    <!-- JavaScript for toggling sidebar -->
+    <script>
+        function closeSearchModal() {
+            document.getElementById("searchModal").style.display = "none";
+        }
+    </script>
+
+    <!-- Include your scripts -->
+   
+    <script src="js/sidebar.js"></script>
+
+
+</body>
+
+</html>

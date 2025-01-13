@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriPetvax Dashboard</title>
+    <link rel="stylesheet" href="css/docstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/footer.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Dashboard Container */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            /* Stack content vertically */
+            padding: 1em;
+            border-radius: 8px;
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+            /* Added font for better design */
+        }
+
+        .dashboard h1 {
+            margin-bottom: 1em;
+            color: #07693e;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        /* Info Cards (Right side) */
+        .info-cards {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1em;
+        }
+
+        .info-card {
+            color: #ffffff;
+            /* White text for better contrast */
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            transition: transform 0.3s ease;
+        }
+
+        /* Dogs card (green) */
+        .info-card:nth-child(1) {
+            background-color: #064d2b;
+            /* Green */
+        }
+
+        /* Cats card (blue) */
+        .info-card:nth-child(2) {
+            background-color: #2196f3;
+            /* Blue */
+        }
+
+        /* Total pets card (orange) */
+        .info-card:nth-child(3) {
+            background-color: #ff9800;
+            /* Orange */
+        }
+
+        .info-card:hover {
+            transform: scale(1.05);
+        }
+
+        .info-card h2 {
+            margin: 0;
+            font-size: 2.5em;
+            color: white;
+        }
+
+        .info-card p {
+            margin: 0.5em 0 0;
+            color: #f4f4f4;
+            font-size: 1em;
+        }
+
+        /* Service Cards */
+        .service-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2em;
+            margin-bottom: 3em;
+            padding: 1em;
+        }
+
+        .service-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 1em;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+            width: 250px;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card img {
+            width: 60%;
+            border-radius: 3px;
+            margin-bottom: 1em;
+        }
+
+        .service-card h3 {
+            color: #5b5bc8;
+            margin: 1em 0 0.5em;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .service-card p {
+            color: black;
+            font-size: 1em;
+        }
+
+        .service-card button {
+            margin-top: 1em;
+            background-color: #5b5bc8;
+            color: #fff;
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.2s;
+        }
+
+        .service-card button:hover {
+            background-color: #4949b8;
+        }
+
+        /* Chart Container (Left side) */
+        .chart-container {
+            flex: 1;
+            /* Chart takes equal space with the info cards */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            margin: 20px;
+            height: 450px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #18621a;
+        }
+
+        .chart-container canvas {
+            width: 80%;
+            height: auto;
+            max-height: 450px;
+            height: 450px;
+        }
+
+        /* Real-Time Date Styling */
+        .real-time-date {
+            font-size: 16px;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 10px;
+            padding-top: 10px;
+            display: flex;
+
+        }
+
+        /* Main Container */
+        .table-container {
+            margin-left: 2%;
+            margin-right: 2%;
+            width: 93%;
+            display: flex;
+            justify-content: space-between;
+            /* Ensure space between the chart and info cards */
+            gap: 5px;
+            /* Adds space between chart and info cards */
+            margin-top: 20px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 300px) {
+            .dashboard {
+                padding: 1.5em;
+            }
+
+            .dashboard h1 {
+                font-size: 2em;
+            }
+
+            .info-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .table-container {
+                width: 20%;
+                flex-direction: column;
+                /* Stack the chart and info cards vertically on mobile */
+                gap: 20px;
+                margin: 1px;
+            }
+
+            .info-card {
+                width: 80%;
+                /* Full-width on mobile for better visibility */
+                padding: 1.5em;
+            }
+
+            .service-cards {
+                grid-template-columns: 1fr;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .service-card {
+                width: 80%;
+                padding: 1.5em;
+            }
+
+            .chart-container {
+                width: 10%;
+                height: 450px;
+            }
+        }
+
+        /* For screens larger than 1200px, increase widths */
+        @media (min-width: 1200px) {
+            .info-card {
+                width: 300px;
+                /* Slightly larger cards for wider screens */
+            }
+
+            .service-card {
+                width: 350px;
+            }
+        }
+
+        .date-filter {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping for smaller screens */
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 1400px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Added subtle shadow for better aesthetics */
+}
+
+.date-filter label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    flex: 1 1 auto; /* Flex auto width for responsiveness */
+    text-align: center;
+}
+
+.date-filter input[type="date"] {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+    flex: 1 1 auto; /* Flex for better resizing */
+    min-width: 150px;
+}
+
+.date-filter input[type="date"]:focus {
+    border-color: #2196f3; /* Blue border on focus */
+    box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+}
+
+.date-filter button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    
+    font-weight: bold;
+      width: 170px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.date-filter button:hover {
+    background-color: #45a049;
+}
+
+.date-filter button:active {
+    background-color: #3e8e41;
+    transform: scale(0.95);
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .date-filter {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+        width: 100%;
+    }
+
+    .date-filter label {
+        text-align: left;
+        width: 100%;
+    }
+
+    .date-filter input[type="date"], 
+    .date-filter button {
+        width: 80%; /* Full width on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .date-filter {
+        padding: 10px;
+        gap: 8px;
+        width: 80%; /* Full width on smaller screens */
+   
+    }
+
+    .date-filter button {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+        width: 100%;
+        min-width: 150px;
+    
+    }
+}
+
+    </style>
+
+    <script type="module">
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, get,set, push } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4vX6POXPx9lGEk2SvbSzPCBxDDHyv51c",
+            authDomain: "agripetvax-e0902.firebaseapp.com",
+            databaseURL: "https://agripetvax-e0902-default-rtdb.firebaseio.com",
+            projectId: "agripetvax-e0902",
+            storageBucket: "agripetvax-e0902.firebasestorage.app",
+            messagingSenderId: "6172388895",
+            appId: "1:6172388895:web:86ad2a7800c7e5f0bf6f2a",
+            measurementId: "G-PXXRWD5715"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if the user is authenticated
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    // Redirect to login page if not authenticated
+                    window.location.href = 'index.html';
+                }
+            });
+
+            // Logout function
+            document.getElementById('logoutButton').addEventListener('click', async (event) => {
+                event.preventDefault(); // Prevent the default link behavior (navigation)
+
+                // Show a confirmation prompt
+                const isConfirmed = confirm("Are you sure you want to log out?");
+
+                // If the user confirms logout, proceed with signing out
+                if (isConfirmed) {
+                    try {
+                        await signOut(auth); // Sign out the user
+                        window.location.href = 'index.html'; // Redirect to login page
+                    } catch (error) {
+                        console.error("Logout failed: ", error); // Log the error if logout fails
+                    }
+                }
+            });
+        });
+
+        // Initialize the real-time date display
+        function updateRealTimeDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("realTimeDate").textContent = now.toLocaleDateString("en-US", options);
+        }
+        // Call the real-time date function immediately
+        updateRealTimeDate();
+        setInterval(updateRealTimeDate, 60000); // Update every minute
+
+        // Set default Start Date and End Date to today
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("start-date").value = today;
+        document.getElementById("end-date").value = today;
+
+      // Function to count vaccinated pets accurately
+function countVaccinatedPets(applyFilter = false) {
+    const vaccinationRef = ref(db, "PetVaccinationReports");
+
+    // Get the selected date range if filtering is applied
+    const startDate = applyFilter ? new Date(document.getElementById("start-date").value) : null;
+    const endDate = applyFilter ? new Date(document.getElementById("end-date").value) : null;
+
+    get(vaccinationRef)
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                let canineCount = 0;
+                let felineCount = 0;
+
+                // Iterate over the data to count pets
+                for (let key in data) {
+                    const pet = data[key];
+                    const vaccinationDate = new Date(pet.vaccinationDate);
+
+                    // Apply date filtering logic if the filter is enabled
+                    if (
+                        !applyFilter ||
+                        (!isNaN(startDate) && !isNaN(endDate) &&
+                            vaccinationDate >= startDate && vaccinationDate <= endDate)
+                    ) {
+                        // Counting species correctly
+                        if (pet.species && pet.species.toLowerCase() === "canine") {
+                            canineCount++;
+                        } else if (pet.species && pet.species.toLowerCase() === "feline") {
+                            felineCount++;
+                        }
+                    }
+                }
+
+                // Calculate the total pets vaccinated
+                const totalPetsVaccinated = canineCount + felineCount;
+
+                // Log for debugging purposes
+                console.log(`Canines: ${canineCount}, Felines: ${felineCount}, Total: ${totalPetsVaccinated}`);
+
+                // Update the info cards in the UI
+                document.getElementById("vaccinated-dogs").textContent = canineCount;
+                document.getElementById("vaccinated-cats").textContent = felineCount;
+                document.getElementById("total-vaccinated-pets").textContent = totalPetsVaccinated;
+
+                // Update the chart with new data
+                updateChart(canineCount, felineCount, totalPetsVaccinated);
+            } else {
+                console.log("No vaccination data available.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error fetching vaccination data:", error);
+        });
+}
+
+        // Event listener for the filter button
+        document.getElementById("filter-btn").addEventListener("click", () => countVaccinatedPets(true));
+
+        // Function to update the chart with new data
+        function updateChart(canineCount, felineCount, totalPetsVaccinated) {
+            const ctx = document.getElementById("chartVaccination").getContext("2d");
+
+            if (window.vaccinationChart) {
+                window.vaccinationChart.destroy();
+            }
+
+            window.vaccinationChart = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: ["Dogs", "Cats", "Total Pets"],
+                    datasets: [
+                        {
+                            label: "Number of Vaccinated Pets",
+                            data: [canineCount, felineCount, totalPetsVaccinated],
+                            backgroundColor: ["#064d2b", "#2196f3", "#ff9800"],
+                            borderColor: ["#064d2b", "#1976d2", "#f57c00"],
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                        },
+                    },
+                },
+            });
+        }
+
+        // Initialize the page by loading all data
+        document.addEventListener("DOMContentLoaded", () => countVaccinatedPets(false));
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <img src="img/petlogo.png" alt="Department of Agriculture" class="header-logo">
+            <span class="welcome-message">AgriPetvax</span>
+        </div>
+
+        <div class="welcome-container">
+            <img src="img/icon1.png" alt="Username Icon" class="user-icon">
+            <span class="welcome-message">Admin Dashboard</span>
+        </div>
+
+
+    </div>
+
+
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="dashboard.html" class="active">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="petprofile.html">
+            <i class="fas fa-paw"></i> Pet Record
+        </a>
+        <a href="register.html">
+            <i class="fas fa-clipboard-list"></i> Pet Registration
+        </a>
+
+        <a href="vaccination_input.html">
+            <i class="fas fa-notes-medical"></i> Pet Vaccination Entry
+        </a>
+
+
+        <a href="manage_report.html">
+            <i class="fas fa-chart-bar"></i> Pet Vaccination Report
+        </a>
+
+
+        <a href="about.html">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+        <!-- Logout Button -->
+        <a href="#" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+
+    </div>
+
+    <div class="form-container">
+
+
+
+        <h1 style="text-align: center;">Welcome to Pet Vaccination System</h1>
+        <!-- Date Filter -->
+        <div class="date-filter">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" />
+
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" />
+
+            <button id="filter-btn">Apply Filter</button>
+            <div class="real-time-date" id="realTimeDate"></div>
+
+
+        </div>
+        <!-- Main Container -->
+        <div class="dashboard">
+            <div class="table-container">
+                <!-- Chart -->
+                <div class="chart-container">
+                    <canvas id="chartVaccination"></canvas>
+                </div>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h2 id="vaccinated-dogs">0</h2>
+                        <p>Number of Vaccinated Dogs</p>
+                    </div>
+                    <div class="info-card">
+                        <h2 id="vaccinated-cats">0</h2>
+                        <p>Number of Vaccinated Cats</p>
+                    </div>
+                    <div class="info-card">
+                        <h2 id="total-vaccinated-pets">0</h2>
+                        <p>Total Pets Vaccinated in Villanueva</p>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="service-cards">
+            <div class="service-card">
+                <img src="img/dash1.jpg" alt="Pet Details">
+                <h3>Pet Record</h3>
+                <p>Search and View Pet Record.</p>
+                <a href="petprofile.html" class="view-more-button">View More</a>
+            </div>
+           
+         
+            <div class="service-card">
+                <img src="img/dash5.webp" alt="Boarding Places">
+                <h3>Pet Vaccination Report</h3>
+                <p>Search and Generate Report.</p>
+                <a href="manage_report.html" class="view-more-button">View More</a>
+            </div>
+            <div class="service-card">
+                <img src="img/Dash3.jpg" alt="Pet Accessories">
+                <h3>Pet Vaccination Entry</h3>
+                <p>Add, Update, Search Pet Record.</p>
+                <a href="vaccination_input.html" class="view-more-button">View More</a>
+            </div>
+            <div class="service-card">
+                <img src="img/dash4.png" alt="Vaccination Reports">
+                <h3>Pet Registration</h3>
+                <p>Add Pet Record.</p>
+                <a href="register.html" class="view-more-button">View More</a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        // Function to update the date and time in real-time
+        function updateDateTime() {
+            const dateContainer = document.getElementById('realTimeDate');
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            dateContainer.textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Update the date and time every second
+        setInterval(updateDateTime, 1000);
+        const ctx = document.getElementById('chartVaccination').getContext('2d');
+
+    </script>
+
+
+    <!-- Overlay to close sidebar -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+
+    <!-- JavaScript for toggling sidebar, submenu, and logout dropdown -->
+    <script>
+
+
+
+
+
+        // To toggle submenu visibility when sidebar is opened
+        function toggleSubMenu(event) {
+            // Prevent default link behavior
+            event.preventDefault();
+
+            const submenu = event.target.nextElementSibling;
+            if (submenu && submenu.classList.contains("submenu")) {
+                submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+            }
+        }
+
+        // Add event listeners for submenu links if necessary
+        document.querySelectorAll('.submenu-link').forEach(link => {
+            link.addEventListener('click', toggleSubMenu);
+        });
+
+
+    </script>
+    <script src="js/sidebar.js"></script>
+
+
+    <footer>
+        <p>&copy; 2024 AgriPetvax. All rights reserved.</p>
+    </footer>
+
+
+</body>
+
+</html>

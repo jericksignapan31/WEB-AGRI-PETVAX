@@ -1,0 +1,205 @@
+<!-- Search Bar -->
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Enter pet name to search...">
+  <button id="searchButton">Search</button>
+</div>
+
+<!-- Autofill Form -->
+<form id="entryForm">
+  <div class="grid-container">
+      <!-- Pet Details -->
+      <div class="form-group">
+          <label for="pet_name">Pet Name</label>
+          <input type="text" id="pet_name" disabled>
+      </div>
+      <div class="form-group">
+          <label for="owner_name">Owner's Name</label>
+          <input type="text" id="owner_name" disabled>
+      </div>
+      <div class="form-group">
+          <label for="barangay">Barangay</label>
+          <select id="barangay" name="barangay" disabled>
+              <!-- Barangay options -->
+          </select>
+      </div>
+      <div class="form-group">
+          <label for="species">Species</label>
+          <select id="species" disabled>
+              <!-- Species options -->
+          </select>
+      </div>
+      <!-- New Data Entry (Vaccination Information) -->
+      <div class="form-group">
+          <label for="vaccination_date">Vaccination Date</label>
+          <input type="date" id="vaccination_date" required>
+      </div>
+      <div class="form-group">
+          <label for="batch_no">Batch No</label>
+          <input type="text" id="batch_no" required>
+      </div>
+      <div class="form-group">
+          <label for="vaccine_source">Vaccine Source</label>
+          <input type="text" id="vaccine_source" required>
+      </div>
+      <div class="form-group">
+          <label for="remarks">Remarks</label>
+          <textarea id="remarks" rows="1"></textarea>
+      </div>
+      <div class="button-container">
+          <button type="submit">Submit</button>
+      </div>
+  </div>
+</form>
+
+<!-- Vaccination Monitoring Table -->
+<h2>Vaccination Monitoring</h2>
+<table border="1">
+  <thead>
+      <tr>
+          <th>Date</th>
+          <th>Batch No</th>
+          <th>Vaccine Source</th>
+          <th>Remarks</th>
+      </tr>
+  </thead>
+  <tbody id="vaccinationTableBody">
+      <!-- Dynamic rows will be appended here -->
+  </tbody>
+</table>
+
+<script>
+  const db = firebase.database();
+  const searchButton = document.getElementById('searchButton');
+  const searchInput = document.getElementById('searchInput');
+  const entryForm = document.getElementById('entryForm');
+  const vaccinationTableBody = document.getElementById('vaccinationTableBody');
+  
+  // Search functionality
+  searchButton.addEventListener('click', () => {
+      const petName = searchInput.value.trim();
+      if (petName) {
+          // Search for the pet in the database
+          const petsRef = db.ref('Pets'); // Replace 'Pets' with your pets collection
+          petsRef.orderByChild('petName').equalTo(petName).once('value', snapshot => {
+              if (snapshot.exists()) {
+                  const petData = snapshot.val();
+                  const petKey = Object.keys(petData)[0]; // Assuming unique pet names
+                  const petInfo = petData[petKey];
+
+                  // Autofill pet data
+                  document.getElementById('pet_name').value = petInfo.petName;
+                  document.getElementById('owner_name').value = petInfo.ownerName;
+                  document.getElementById('barangay').value = petInfo.barangay;
+                  document.getElementById('species').value = petInfo.species;
+
+                  // Autofill vaccination monitoring if available
+                  const vaccinationReports = petInfo.vaccinationReports || [];
+                  vaccinationTableBody.innerHTML = ''; // Clear previous rows
+                  vaccinationReports.forEach(vaccination => {
+                      const row = document.createElement('tr');
+                      row.innerHTML = `
+                          <td>${vaccination.vaccinationDate || 'N/A'}</td>
+                          <td>${vaccination.batchNo || 'N/A'}</td>
+                          <td>${vaccination.vaccineSource || 'N/A'}</td>
+                          <td>${vaccination.remarks || 'N/A'}</td>
+                      `;
+                      vaccinationTableBody.appendChild(row);
+                  });
+
+              } else {
+                  alert('Pet not found!');
+              }
+          });
+      }
+  });
+
+  // Handle form submission (add new vaccination entry)
+  entryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const petName = document.getElementById('pet_name').value;
+      const vaccinationDate = document.getElementById('vaccination_date').value;
+      const batchNo = document.getElementById('batch_no').value;
+      const vaccineSource = document.getElementById('vaccine_source').value;
+      const remarks = document.getElementById('remarks').value;
+
+      // Ensure all required fields are filled
+      if (vaccinationDate && batchNo && vaccineSource) {
+          const newVaccinationData = {
+              vaccinationDate,
+              batchNo,
+              vaccineSource,
+              remarks
+          };
+
+          // Update the pet record with new vaccination entry
+          const petsRef = db.ref('Pets'); // Replace 'Pets' with your pets collection
+          petsRef.orderByChild('petName').equalTo(petName).once('value', snapshot => {
+              if (snapshot.exists()) {
+                  const petKey = Object.keys(snapshot.val())[0];
+                  const petRef = petsRef.child(petKey);
+
+                  // Append the new vaccination data to the existing report
+                  petRef.child('vaccinationReports').push(newVaccinationData)
+                      .then(() => {
+                          console.log('Vaccination data successfully added!');
+                          // Optionally, you can refresh the vaccination table here
+                      })
+                      .catch(error => {
+                          console.error('Error adding vaccination data:', error);
+                      });
+              }
+          });
+      } else {
+          alert('Please fill in all the required fields!');
+      }
+  });
+</script>
+
+
+
+
+
+
+
+function showVaccinationDetails(petData) {
+    const vaccinationRef = ref(db, "PetVaccinationReports", "register");
+
+    onValue(vaccinationRef, (snapshot) => {
+        // Get the table body element
+        const vaccinationTableBody = document.getElementById("vaccinationTableBody");
+
+        // Clear existing rows in the table body
+        vaccinationTableBody.innerHTML = "";
+
+        snapshot.forEach((childSnapshot) => {
+            const entry = childSnapshot.val();
+
+            // Check if the entry matches the pet name
+            if (entry.petName === petData.petName) {
+                // Create a new row
+                const newRow = document.createElement("tr");
+
+                // Create cells for each column
+                const dateCell = document.createElement("td");
+                dateCell.textContent = entry.vaccinationDate || 'N/A';
+                newRow.appendChild(dateCell);
+
+                const batchNoCell = document.createElement("td");
+                batchNoCell.textContent = entry.batchNo || 'N/A';
+                newRow.appendChild(batchNoCell);
+
+                const sourceCell = document.createElement("td");
+                sourceCell.textContent = entry.vaccineSource || 'N/A';
+                newRow.appendChild(sourceCell);
+
+                const remarksCell = document.createElement("td");
+                remarksCell.textContent = entry.remarks || 'N/A';
+                newRow.appendChild(remarksCell);
+
+                // Append the new row to the table body
+                vaccinationTableBody.appendChild(newRow);
+            }
+        });
+    });
+}
