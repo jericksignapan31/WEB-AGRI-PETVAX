@@ -599,6 +599,112 @@ button.delete:hover {
                 text-align: center;
             }
         }
+
+        /* SweetAlert2 Container Customization */
+.swal2-container {
+    z-index: 1060; /* Ensure it appears above other elements */
+}
+
+/* Dialog Box Styling */
+.swal2-popup {
+    border-radius: 12px; /* Rounded corners */
+    font-size: 16px; /* Font size for content */
+    background-color: #fdfdfd; /* Background color */
+    border: 2px solid #4caf50; /* Green border for emphasis */
+    padding: 20px;
+}
+
+/* Title Styling */
+.swal2-title {
+    font-size: 24px; /* Larger font size for the title */
+    font-weight: bold;
+    color: #4caf50; /* Green color for the title */
+    margin-bottom: 10px;
+}
+
+/* Input Field Styling */
+.swal2-input {
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded input fields */
+    padding: 10px;
+    font-size: 14px;
+    width: 100%; /* Full width */
+    margin-top: 5px;
+}
+
+/* Button Styling */
+.swal2-confirm {
+    background-color: #4caf50; /* Green confirm button */
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.swal2-confirm:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.swal2-cancel {
+    background-color: #f44336; /* Red cancel button */
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.swal2-cancel:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+/* Label Styling */
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333; /* Dark text color */
+}
+
+/* Custom scrollbar for SweetAlert2 inputs (optional) */
+.swal2-popup .swal2-content {
+    max-height: 400px; /* Limit content height */
+    overflow-y: auto; /* Add scroll if content overflows */
+    scrollbar-width: thin; /* Firefox scrollbar */
+    scrollbar-color: #ccc #f5f5f5; /* Firefox scrollbar colors */
+}
+
+.swal2-popup .swal2-content::-webkit-scrollbar {
+    width: 8px; /* Scrollbar width for WebKit browsers */
+}
+
+.swal2-popup .swal2-content::-webkit-scrollbar-thumb {
+    background: #ccc; /* Scrollbar thumb color */
+    border-radius: 10px;
+}
+
+.swal2-popup .swal2-content::-webkit-scrollbar-track {
+    background: #f5f5f5; /* Scrollbar track color */
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .swal2-popup {
+        width: 90%; /* Reduce width on smaller screens */
+    }
+
+    .swal2-title {
+        font-size: 20px; /* Smaller title font size */
+    }
+
+    .swal2-input {
+        font-size: 14px; /* Smaller input font size */
+    }
+}
+
 /* Wrapper for both left and right sections */
 .container {
     display: flex;
@@ -978,73 +1084,137 @@ function paginateData(data) {
         actionDiv.classList.add("action-buttons");
 
         const editButton = document.createElement("button");
-        editButton.classList.add("edit");
-        editButton.textContent = "Edit";
-        editButton.onclick = function () {
-            // Prompt for each field to edit
-            const newPetName = prompt("Enter the new pet name:", entry.petName);
-            const newVaccinationDate = prompt("Enter the new vaccination date:", entry.vaccinationDate);
-            const newBarangay = prompt("Enter the new barangay:", entry.barangay);
-            const newOwnerName = prompt("Enter the new owner name:", entry.ownerName);
-            const newSpecies = prompt("Enter the new species:", entry.species);
-            const newSex = prompt("Enter the new sex:", entry.sex);
-            const newAge = prompt("Enter the new age:", entry.age);
-            const newHeads = prompt("Enter the new heads:", entry.heads);
-            const newColor = prompt("Enter the new color:", entry.color);
-            const newBatchNo = prompt("Enter the new batch number:", entry.batchNo);
-            const newVaccineSource = prompt("Enter the new vaccine source:", entry.vaccineSource);
-            const newRemarks = prompt("Enter the new remarks:", entry.remarks);
+editButton.classList.add("edit");
+editButton.textContent = "Edit";
 
-            // Check if all fields are provided (not empty)
-            if (
-                newPetName && newVaccinationDate && newBarangay && newOwnerName &&
-                newSpecies && newSex && newAge && newHeads && newColor && newBatchNo &&
-                newVaccineSource && newRemarks
-            ) {
-                // Prepare the updates object to modify existing data
-                const updates = {
-                    [`PetVaccinationReports/${entry.key}/petName`]: newPetName,
-                    [`PetVaccinationReports/${entry.key}/vaccinationDate`]: newVaccinationDate,
-                    [`PetVaccinationReports/${entry.key}/barangay`]: newBarangay,
-                    [`PetVaccinationReports/${entry.key}/ownerName`]: newOwnerName,
-                    [`PetVaccinationReports/${entry.key}/species`]: newSpecies,
-                    [`PetVaccinationReports/${entry.key}/sex`]: newSex,
-                    [`PetVaccinationReports/${entry.key}/age`]: newAge,
-                    [`PetVaccinationReports/${entry.key}/heads`]: newHeads,
-                    [`PetVaccinationReports/${entry.key}/color`]: newColor,
-                    [`PetVaccinationReports/${entry.key}/batchNo`]: newBatchNo,
-                    [`PetVaccinationReports/${entry.key}/vaccineSource`]: newVaccineSource,
-                    [`PetVaccinationReports/${entry.key}/remarks`]: newRemarks,
+editButton.onclick = async function () {
+    const { value: formValues } = await Swal.fire({
+        title: 'Edit Pet Record',
+        html: `
+            <label for="swal-pet-name">Pet Name:</label>
+            <input id="swal-pet-name" class="swal2-input" value="${entry.petName || ''}">
 
-                    // Also update in the register path (though it's not displayed)
-                    [`register/${entry.key}/petName`]: newPetName,
-                    [`register/${entry.key}/vaccinationDate`]: newVaccinationDate,
-                    [`register/${entry.key}/barangay`]: newBarangay,
-                    [`register/${entry.key}/ownerName`]: newOwnerName,
-                    [`register/${entry.key}/species`]: newSpecies,
-                    [`register/${entry.key}/sex`]: newSex,
-                    [`register/${entry.key}/age`]: newAge,
-                    [`register/${entry.key}/heads`]: newHeads,
-                    [`register/${entry.key}/color`]: newColor,
-                    [`register/${entry.key}/batchNo`]: newBatchNo,
-                    [`register/${entry.key}/vaccineSource`]: newVaccineSource,
-                    [`register/${entry.key}/remarks`]: newRemarks
-                };
+            <label for="swal-vaccination-date">Vaccination Date:</label>
+            <input id="swal-vaccination-date" class="swal2-input" type="date" value="${entry.vaccinationDate || ''}">
 
-                // Update the data without creating a new entry
-                update(ref(db), updates)
-                    .then(() => {
-                        alert("Pet record updated successfully!");
-                        displayVaccinationData(); // Refresh the table to show the updates
-                    })
-                    .catch((error) => {
-                        console.error("Error updating the pet record:", error);
-                        alert("Failed to update the pet record. Please try again.");
-                    });
-            } else {
-                alert("Please fill out all fields to update the record.");
+            <label for="swal-barangay">Barangay:</label>
+            <input id="swal-barangay" class="swal2-input" value="${entry.barangay || ''}">
+
+            <label for="swal-owner-name">Owner's Name:</label>
+            <input id="swal-owner-name" class="swal2-input" value="${entry.ownerName || ''}">
+
+            <label for="swal-species">Species:</label>
+            <input id="swal-species" class="swal2-input" value="${entry.species || ''}">
+
+            <label for="swal-sex">Sex:</label>
+            <input id="swal-sex" class="swal2-input" value="${entry.sex || ''}">
+
+            <label for="swal-age">Age:</label>
+            <input id="swal-age" class="swal2-input" value="${entry.age || ''}">
+
+            <label for="swal-heads">No. of Heads:</label>
+            <input id="swal-heads" class="swal2-input" value="${entry.heads || ''}">
+
+            <label for="swal-color">Color:</label>
+            <input id="swal-color" class="swal2-input" value="${entry.color || ''}">
+
+            <label for="swal-batch-no">Batch No.:</label>
+            <input id="swal-batch-no" class="swal2-input" value="${entry.batchNo || ''}">
+
+            <label for="swal-vaccine-source">Vaccine Source:</label>
+            <input id="swal-vaccine-source" class="swal2-input" value="${entry.vaccineSource || ''}">
+
+            <label for="swal-remarks">Remarks:</label>
+            <input id="swal-remarks" class="swal2-input" value="${entry.remarks || ''}">
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+            return {
+                petName: document.getElementById('swal-pet-name').value,
+                vaccinationDate: document.getElementById('swal-vaccination-date').value,
+                barangay: document.getElementById('swal-barangay').value,
+                ownerName: document.getElementById('swal-owner-name').value,
+                species: document.getElementById('swal-species').value,
+                sex: document.getElementById('swal-sex').value,
+                age: document.getElementById('swal-age').value,
+                heads: document.getElementById('swal-heads').value,
+                color: document.getElementById('swal-color').value,
+                batchNo: document.getElementById('swal-batch-no').value,
+                vaccineSource: document.getElementById('swal-vaccine-source').value,
+                remarks: document.getElementById('swal-remarks').value
+            };
+        }
+    });
+
+    if (formValues) {
+        const {
+            petName, vaccinationDate, barangay, ownerName,
+            species, sex, age, heads, color, batchNo, vaccineSource, remarks
+        } = formValues;
+
+        if (
+            petName && vaccinationDate && barangay && ownerName &&
+            species && sex && age && heads && color && batchNo &&
+            vaccineSource && remarks
+        ) {
+            const updates = {
+                [`PetVaccinationReports/${entry.key}/petName`]: petName,
+                [`PetVaccinationReports/${entry.key}/vaccinationDate`]: vaccinationDate,
+                [`PetVaccinationReports/${entry.key}/barangay`]: barangay,
+                [`PetVaccinationReports/${entry.key}/ownerName`]: ownerName,
+                [`PetVaccinationReports/${entry.key}/species`]: species,
+                [`PetVaccinationReports/${entry.key}/sex`]: sex,
+                [`PetVaccinationReports/${entry.key}/age`]: age,
+                [`PetVaccinationReports/${entry.key}/heads`]: heads,
+                [`PetVaccinationReports/${entry.key}/color`]: color,
+                [`PetVaccinationReports/${entry.key}/batchNo`]: batchNo,
+                [`PetVaccinationReports/${entry.key}/vaccineSource`]: vaccineSource,
+                [`PetVaccinationReports/${entry.key}/remarks`]: remarks,
+
+                // Also update in the register path
+                [`register/${entry.key}/petName`]: petName,
+                [`register/${entry.key}/vaccinationDate`]: vaccinationDate,
+                [`register/${entry.key}/barangay`]: barangay,
+                [`register/${entry.key}/ownerName`]: ownerName,
+                [`register/${entry.key}/species`]: species,
+                [`register/${entry.key}/sex`]: sex,
+                [`register/${entry.key}/age`]: age,
+                [`register/${entry.key}/heads`]: heads,
+                [`register/${entry.key}/color`]: color,
+                [`register/${entry.key}/batchNo`]: batchNo,
+                [`register/${entry.key}/vaccineSource`]: vaccineSource,
+                [`register/${entry.key}/remarks`]: remarks
+            };
+
+            try {
+                await update(ref(db), updates);
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Pet record updated successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+                displayVaccinationData(); // Refresh table
+            } catch (error) {
+                console.error("Error updating the pet record:", error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to update the pet record. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
-        };
+        } else {
+            Swal.fire({
+                title: 'Incomplete Fields',
+                text: 'Please fill out all fields to update the record.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+};
+
 
         // Delete button
         const deleteButton = document.createElement("button");
