@@ -7,6 +7,8 @@
     <title>Manage Report</title>
     <link rel="stylesheet" href="css/docstyle.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
  <!-- Include Font Awesome CDN in the <head> of your HTML -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -1307,6 +1309,89 @@ function updatePaginationControls() {
 
         //end code for pages
 
+        async function printReport() {
+            console.log('aw');
+            
+    // if (!filteredData || filteredData.length === 0) {
+    //     Swal.fire({
+    //         title: 'No Data',
+    //         text: 'There are no records to display based on the current filters.',
+    //         icon: 'info',
+    //         confirmButtonText: 'OK'
+    //     });
+    //     return;
+    // }
+
+    // // Load jsPDF
+    // const { jsPDF } = window.jspdf;
+
+    // // Create a new jsPDF instance
+    // const doc = new jsPDF();
+
+    // // Title and metadata
+    // doc.setFontSize(16);
+    // doc.text('Filtered Vaccination Report', 105, 15, { align: 'center' });
+    // doc.setFontSize(12);
+    // doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
+
+    // // Table Header
+    // const headers = [
+    //     'Pet Name',
+    //     'Vaccination Date',
+    //     'Barangay',
+    //     'Owner',
+    //     'Species',
+    //     'Sex',
+    //     'Age',
+    //     'Heads',
+    //     'Color',
+    //     'Batch No.',
+    //     'Source',
+    //     'Remarks'
+    // ];
+    // const headerYPosition = 30;
+    // let currentY = headerYPosition;
+
+    // // Add header row
+    // doc.setFontSize(10);
+    // headers.forEach((header, index) => {
+    //     doc.text(header, 10 + index * 18, currentY);
+    // });
+
+    // // Table Rows
+    // filteredData.forEach((row, rowIndex) => {
+    //     currentY += 10;
+    //     if (currentY > 280) {
+    //         doc.addPage(); // Add a new page if content exceeds the page
+    //         currentY = 20;
+    //     }
+
+    //     const rowValues = [
+    //         row.petName,
+    //         row.vaccinationDate,
+    //         row.barangay,
+    //         row.ownerName,
+    //         row.species,
+    //         row.sex,
+    //         row.age,
+    //         row.heads,
+    //         row.color,
+    //         row.batchNo,
+    //         row.vaccineSource,
+    //         row.remarks,
+    //     ];
+
+    //     rowValues.forEach((value, colIndex) => {
+    //         doc.text(String(value || ''), 10 + colIndex * 18, currentY);
+    //     });
+    // });
+
+    // // Open PDF in a new tab
+    // window.open(doc.output('bloburl'), '_blank');
+}
+
+
+
 
 
 
@@ -1460,9 +1545,11 @@ function updatePaginationControls() {
                 <button id="uploadButton">Upload JSON</button>
             </div>
             
+           
+        </div>
+
         <div class="print-button">
             <button onclick="printReport()">Print</button>
-        </div>
         </div>
 
 
