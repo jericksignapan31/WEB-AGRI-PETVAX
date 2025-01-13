@@ -7,6 +7,7 @@
     <title>Pet Registration</title>
     <link rel="stylesheet" href="css/docstyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         .success-prompt {
@@ -211,86 +212,85 @@
 
 
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const entryForm = document.getElementById("entryForm");
-            const successPrompt = document.getElementById("successPrompt");
-            const alreadyRegisteredPrompt = document.getElementById("alreadyRegisteredPrompt");
-            const goToVaccinationButton = document.getElementById('goToVaccinationButton');
-            const petDataRef = ref(db, 'register/');
+document.addEventListener("DOMContentLoaded", () => {
+    const entryForm = document.getElementById("entryForm");
+    const petDataRef = ref(db, 'register/');
 
-            entryForm.addEventListener("submit", function (e) {
-                e.preventDefault();
+    entryForm.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-                const petData = {
-                    petName: document.getElementById("pet_name").value,
-                    ownerName: document.getElementById("owner_name").value,
-                    species: document.getElementById("species").value,
-                    age: `${document.getElementById("age_number").value} ${document.getElementById("age_unit").value}`,
-                    heads: document.getElementById("heads").value,
-                    sex: document.getElementById("sex").value,
-                    color: document.getElementById("color").value,
-                    barangay: document.getElementById("barangay").value,
-                };
+        const petData = {
+            petName: document.getElementById("pet_name").value,
+            ownerName: document.getElementById("owner_name").value,
+            species: document.getElementById("species").value,
+            age: `${document.getElementById("age_number").value} ${document.getElementById("age_unit").value}`,
+            heads: document.getElementById("heads").value,
+            sex: document.getElementById("sex").value,
+            color: document.getElementById("color").value,
+            barangay: document.getElementById("barangay").value,
+        };
 
-                // Check if pet is already registered (unique check based on fields)
-                checkPetExistence(petData);
-            });
+        // Check if pet is already registered
+        checkPetExistence(petData);
+    });
 
-            async function checkPetExistence(data) {
-                const petRef = ref(db, 'register/');
+    async function checkPetExistence(data) {
+        const petRef = ref(db, 'register/');
+        const snapshot = await get(petRef);
 
-                // Query the database to find pets with the same name, owner's name, species, and barangay
-                const snapshot = await get(petRef);
+        let isRegistered = false;
 
-                let isRegistered = false;
-
-                snapshot.forEach(childSnapshot => {
-                    const pet = childSnapshot.val();
-
-                    // Check if there is already a pet with the same name, owner name, species, and barangay
-                    if (pet.petName === data.petName && pet.ownerName === data.ownerName && pet.species === data.species && pet.barangay === data.barangay) {
-                        isRegistered = true;
-                    }
-                });
-
-                if (isRegistered) {
-                    // Show the already registered prompt
-                    const alreadyRegisteredPrompt = document.getElementById("alreadyRegisteredPrompt");
-                    alreadyRegisteredPrompt.style.display = "block";
-
-                    // Attach a click event listener to the Close button
-                    const closeButton = alreadyRegisteredPrompt.querySelector(".close-button");
-                    closeButton.addEventListener("click", () => {
-                        alreadyRegisteredPrompt.style.display = "none"; // Hide the prompt when clicked
-                    });
-                } else {
-                    // Proceed with saving the new pet data (using Firebase's push ID for uniqueness)
-                    saveToFirebase(data);
-                }
-            }
-
-            function saveToFirebase(data) {
-                // Use Firebase push() to generate a unique ID for each pet
-                const newPetRef = push(ref(db, 'register/'));
-
-                // Save the pet data using the generated unique push ID
-                set(newPetRef, data)
-                    .then(() => {
-                        successPrompt.style.display = "block";
-                        // Redirect to vaccination form with the pet's unique ID
-                        const vaccinationUrl = `vaccination_input.html?petId=${newPetRef.key}&petName=${data.petName}&ownerName=${data.ownerName}&barangay=${data.barangay}&species=${data.species}&sex=${data.sex}&age=${data.age}&heads=${data.heads}&color=${data.color}`;
-
-                        // Redirect user to vaccination form
-                        document.getElementById('goToVaccinationButton').onclick = function () {
-                            window.location.href = vaccinationUrl;
-                        };
-                    })
-                    .catch((error) => {
-                        console.error("Error saving pet data: ", error);
-                        alert("Error saving data, please try again.");
-                    });
+        snapshot.forEach(childSnapshot => {
+            const pet = childSnapshot.val();
+            if (pet.petName === data.petName && pet.ownerName === data.ownerName && pet.species === data.species && pet.barangay === data.barangay) {
+                isRegistered = true;
             }
         });
+
+        if (isRegistered) {
+            // Show SweetAlert for already registered
+            Swal.fire({
+                title: "Pet Already Registered",
+                text: "This pet is already registered. Please check the vaccination records.",
+                icon: "info",
+                confirmButtonText: "Close"
+            });
+        } else {
+            // Save new pet data
+            saveToFirebase(data);
+        }
+    }
+
+    function saveToFirebase(data) {
+        const newPetRef = push(ref(db, 'register/'));
+
+        set(newPetRef, data)
+            .then(() => {
+                // Show success SweetAlert
+                Swal.fire({
+                    title: "Pet Registered Successfully",
+                    text: "The pet has been successfully registered. You will now be redirected to the vaccination form.",
+                    icon: "success",
+                    confirmButtonText: "Go to Vaccination"
+                }).then(() => {
+                    // Redirect to vaccination form
+                    const vaccinationUrl = `vaccination_input.html?petId=${newPetRef.key}&petName=${data.petName}&ownerName=${data.ownerName}&barangay=${data.barangay}&species=${data.species}&sex=${data.sex}&age=${data.age}&heads=${data.heads}&color=${data.color}`;
+                    window.location.href = vaccinationUrl;
+                });
+            })
+            .catch((error) => {
+                console.error("Error saving pet data: ", error);
+                // Show error SweetAlert
+                Swal.fire({
+                    title: "Error",
+                    text: "Failed to save the pet data. Please try again.",
+                    icon: "error",
+                    confirmButtonText: "Close"
+                });
+            });
+    }
+});
+
 
         goToRegisterButton.addEventListener('click', () => {
             window.location.href = 'register.html';
