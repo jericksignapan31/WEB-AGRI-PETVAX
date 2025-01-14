@@ -869,11 +869,15 @@
           }
 
             // Function to generate and display PDF
+   
+
+
+
+
             async function ViewPDF() {
     const { jsPDF } = window.jspdf; // Load jsPDF
     const doc = new jsPDF({
         orientation: 'landscape', // Landscape orientation
-      
     });
 
     // Check if there is any filtered data
@@ -888,8 +892,17 @@
     }
 
     // Add title to the PDF
-    doc.setFontSize(12);
-    doc.text("Vaccination Report", 148.5, 10, { align: "center" }); // Center-aligned title for landscape
+    doc.setFontSize(14);
+    doc.text("Vaccination Report", 148.5, 10, { align: "center" }); // Center-aligned title
+    
+    doc.setFontSize(10);
+    doc.text("Province: Misamis Oriental", 10, 20); // Province
+    doc.text("Municipality: Villanueva", 210, 20); // Municipality
+    doc.text("Date Reported: January 2025", 10, 25); // Date Reported
+    doc.text("Livestock Technician: Bonifacio Q. Escatron", 210, 25); // Technician
+
+    // Add spacing after the header
+    let startY = 35;
 
     // Define table headers
     const headers = [
@@ -908,14 +921,14 @@
         "Remarks",
     ];
 
-    // Define column widths (adjust for landscape and long page)
-    const columnWidths = [10, 25, 25, 25, 30, 20, 15, 15, 20, 20, 25, 30, 20];
+    // Define column widths
+    const columnWidths = [10, 25, 25, 25, 30, 20, 15, 20, 20, 15, 25, 30, 20];
 
     // Draw table header with grid
-    let startY = 20;
-    doc.setFontSize(8); // Set smaller font size for table
-    doc.setDrawColor(1); // Black grid
+    doc.setFontSize(8); // Set smaller font size for the table
+    doc.setDrawColor(0); // Black grid
     doc.setFillColor(200, 200, 200); // Light gray background for header
+
     doc.rect(10, startY, columnWidths.reduce((a, b) => a + b, 0), 10, 'F'); // Header background
 
     headers.forEach((header, i) => {
@@ -924,7 +937,7 @@
     });
 
     // Draw table rows
-    startY += 10;
+    startY += 10; // Move to the first row position
     filteredData.forEach((entry, index) => {
         const row = [
             index + 1,
@@ -953,16 +966,31 @@
 
         startY += 10;
 
-        // Add new page if content exceeds custom page size
-        if (startY > 2050) { // Adjust threshold for the long page
-            Swal.fire({
-                title: "Content Exceeds Maximum Page Size",
-                text: "Some rows might be cut off. Adjust filters for better display.",
-                icon: "info",
-                confirmButtonText: "OK",
+        // Add new page if content exceeds the page height
+        if (startY > 185) { // Adjust threshold for new pages
+            doc.addPage();
+            startY = 10;
+
+            // Re-draw table header on new page
+            doc.setFillColor(200, 200, 200); // Header background
+            doc.rect(10, startY, columnWidths.reduce((a, b) => a + b, 0), 10, 'F'); // Header background
+            headers.forEach((header, i) => {
+                const xPos = columnWidths.slice(0, i).reduce((a, b) => a + b, 10);
+                doc.text(header, xPos + 2, startY + 7); // Add padding
             });
+            startY += 10; // Move to next row
         }
     });
+
+     // Add "Submitted by" and "Noted by" section at the bottom
+     startY += 20; // Add spacing below the table
+    doc.setFontSize(10);
+    doc.text("Submitted by: Bonifacio Q. Escatron", 10, startY);
+    doc.text("Livestock Technician", 10, startY + 5);
+
+    doc.text("Noted by: Silvestre L. Gorre Jr., PhD", 210, startY);
+    doc.text("Municipal Agriculturist",210, startY + 5);
+
 
     // Convert the PDF to a Blob and preview it in a new tab
     const pdfBlob = doc.output("blob");
@@ -972,6 +1000,10 @@
 
 // Attach the function to the View PDF button
 document.getElementById("ViewPDF").addEventListener("click", ViewPDF);
+
+
+
+
 
 
  
