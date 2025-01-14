@@ -879,7 +879,7 @@
     const doc = new jsPDF({
         orientation: 'landscape', // Landscape orientation
     });
-
+   
     // Check if there is any filtered data
     if (!filteredData || filteredData.length === 0) {
         Swal.fire({
@@ -890,6 +890,7 @@
         });
         return;
     }
+
 
     // Add title to the PDF
     doc.setFontSize(14);
